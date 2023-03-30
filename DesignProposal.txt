@@ -1,0 +1,19 @@
+MedViz
+
+Description:
+    Desktop application that allows the user to query medical data and perform data visualization.
+Features:
+    GUI that allows users to interact with data.
+        Search for records.
+        Visualize data.
+    Back-end database to store medical data.
+        Google firebase
+        Postgres
+    
+
+
+
+Advanced Concepts:
+1. Networking
+2. Database connection
+3. Concurrency
