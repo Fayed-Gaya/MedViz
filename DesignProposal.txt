@@ -15,5 +15,5 @@ Features:
 
 Advanced Concepts:
 1. Networking
-2. Database connection
+2. Database Connection
 3. Concurrency
