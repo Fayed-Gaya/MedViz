@@ -7,7 +7,7 @@ Features:
         Search for records.
         Visualize data.
     Back-end database to store medical data.
-        Google firebase
+        Google firestore
         Postgres
     
 
