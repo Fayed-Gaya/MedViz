@@ -42,8 +42,6 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://example.com)
 
-Insert screenshot of main page....
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -91,3 +89,6 @@ Advanced Java Concepts:
     - NoSQL Database:GCP Firestore
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- MARKDOWN LINKS & IMAGES -->
+[product-screenshot]: images/loginTemp.png
