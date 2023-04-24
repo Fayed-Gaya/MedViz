@@ -1,6 +1,3 @@
-# MedViz
-MedViz
-
 <!-- Back to top Link -->
 <a name="readme-top"></a>
 
@@ -11,19 +8,10 @@ MedViz
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">project_title</h3>
+<h3 align="center">MedViz</h3>
 
   <p align="center">
-    project_description
-    <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
+    A data visualization application focused on empowering users to derive meaningful insights from medical data
   </p>
 </div>
 
@@ -36,22 +24,14 @@ MedViz
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
-        <li><a href="#built-with">Built With</a></li>
+        <li><a href="#built-with">Project Proposal</a></li>
+        <li><a href="#built-with">Systems Analysis</a></li>
+        <li><a href="#built-with">Data Sources</a></li>
       </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+      <a href="#getting-started">Concepts Covered</a></li>
+    <li><a href="#usage">Feature List</a></li>
   </ol>
 </details>
 
