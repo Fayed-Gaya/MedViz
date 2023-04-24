@@ -75,8 +75,19 @@ Advanced Java Concepts:
 <!-- Feature List -->
 ### Feature List
 
-1. noSQL DBs, GCP Firestore
-2. Clean UI for querying Databases
-3. Concurrency control
+1. GUI
+    - Landing Page
+    - Sign-in Page
+    - Sin-up page
+    - Query Entry Page
+        - Data Visualization Frame
+2. Client
+    - Creates a session to send and receive query data to and from server
+3. Server
+    - Can handle multiple client connections
+4. Database
+    - Store user information
+    - Store data
+    - NoSQL Database:GCP Firestore
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
