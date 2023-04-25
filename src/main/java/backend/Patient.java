@@ -8,13 +8,6 @@ public class Patient {
 			"bronchitis", "sprain", "hypertension", "brain damage", "diabetes"
 			};
 	
-	@Override
-	public String toString() {
-		return "{ fName: " + fName + " , lName: " + lName + " , city: " + city + " , state: " +
-				state + "," + " country: " + country + ", phone: " + phone +
-				", condition: " + condition + " }";
-	}
-	
 	public JSONObject getPatientJSON() {
 		return new JSONObject(this.toString());
 	}
@@ -24,32 +17,24 @@ public class Patient {
 		Random rand = new Random();
 		int conditionIndex = rand.nextInt(10);
 		
-		this.fName = fName;
-		this.lName = lName;
-		this.city = city;
-		this.state = state;
-		this.country = country;
-		this.phone = phone;
-		this.condition = CONDITIONS[conditionIndex];
+		this.setfName(fName);
+		this.setlName(lName);
+		this.setCity(city);
+		this.setState(state);
+		this.setCountry(country);
+		this.setPhone(phone);
+		this.setCondition(CONDITIONS[conditionIndex]);
 	}
 	
 	public Patient(JSONObject patient) {
-			this.fName = patient.getString("fName");
-			this.lName = patient.getString("lName");
-			this.city = patient.getString("city");
-			this.state = patient.getString("state");
-			this.country = patient.getString("country");
-			this.phone = patient.getString("phone");
-			this.condition = patient.getString("condition");
+			this.setfName(patient.getString("fName"));
+			this.setlName(patient.getString("lName"));
+			this.setCity(patient.getString("city"));
+			this.setState(patient.getString("state"));
+			this.setCountry(patient.getString("country"));
+			this.setPhone(patient.getString("phone"));
+			this.setCondition(patient.getString("condition"));
 	}
-	
-	private String fName;
-	private String lName;
-	private String city;
-	private String state;
-	private String country;
-	private String phone;
-	private String condition;
 	
 	public String getCondition() {
 		return condition;
@@ -94,14 +79,27 @@ public class Patient {
 		this.phone = phone;
 	}
 	
+	@Override
+	public String toString() {
+		return "{ fName: " + fName + " , lName: " + lName + " , city: " + city + " , state: " +
+				state + "," + " country: " + country + ", phone: " + phone +
+				", condition: " + condition + " }";
+	}
+	
+	private String fName;
+	private String lName;
+	private String city;
+	private String state;
+	private String country;
+	private String phone;
+	private String condition;
+	
 	public static void main(String[] args) {
 		Patient p = new Patient("Hye44", "Turner526", "Saugus", "Massachusetts", "US", "555-533-6976");
 		System.out.println(p);
 		JSONObject pJson = p.getPatientJSON();
-		System.out.println(pJson.get("condition"));
+		System.out.println(pJson.getString("condition"));
 		Patient pCopy = new Patient(pJson);
 		System.out.println(pCopy);
-
 	}
-
 }
