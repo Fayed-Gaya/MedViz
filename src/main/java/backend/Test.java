@@ -3,6 +3,8 @@ import java.io.IOException;
 
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.firestore.AggregateQuerySnapshot;
+import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
@@ -30,29 +32,18 @@ public class Test {
 			e.printStackTrace();
 		}
 			db = firestoreOptions.getService();
-			
-		// asynchronously retrieve all users
-		ApiFuture<QuerySnapshot> query = db.collection("users").get();
-		// ...
-		// query.get() blocks on response
-		QuerySnapshot querySnapshot = null;
+		
+		CollectionReference collection = db.collection("patients");
+		AggregateQuerySnapshot snapshot = null;
 		try {
-			querySnapshot = query.get();
+			snapshot = collection.count().get().get();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
-		List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
-		for (QueryDocumentSnapshot document : documents) {
-			 System.out.println("User: " + document.getId());
-			 System.out.println("First: " + document.getString("first"));
-			 if (document.contains("middle")) {
-			   System.out.println("Middle: " + document.getString("middle"));
-			 }
-			 System.out.println("Last: " + document.getString("last"));
-			 System.out.println("Born: " + document.getLong("born"));
-		}
+		System.out.println("Count: " + snapshot.getCount());
+
 	}
 
 }
