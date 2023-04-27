@@ -1,5 +1,8 @@
 package backend;
 import org.json.JSONObject;
+import org.json.JSONException;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Patient {
@@ -7,16 +10,12 @@ public class Patient {
 			"prediabetes", "anemia", "sinusitis", "fracture", "cardiac arrest",
 			"bronchitis", "sprain", "hypertension", "brain damage", "diabetes"
 			};
-	
-	public JSONObject getPatientJSON() {
-		return new JSONObject(this.toString());
-	}
-	
+
 	public Patient(String fName, String lName, String city, String state,
 					String country, String phone) {
 		Random rand = new Random();
 		int conditionIndex = rand.nextInt(10);
-		
+
 		this.setfName(fName);
 		this.setlName(lName);
 		this.setCity(city);
@@ -25,8 +24,8 @@ public class Patient {
 		this.setPhone(phone);
 		this.setCondition(CONDITIONS[conditionIndex]);
 	}
-	
-	public Patient(JSONObject patient) {
+
+	public Patient(JSONObject patient) throws JSONException{
 			this.setfName(patient.getString("fName"));
 			this.setlName(patient.getString("lName"));
 			this.setCity(patient.getString("city"));
@@ -35,7 +34,31 @@ public class Patient {
 			this.setPhone(patient.getString("phone"));
 			this.setCondition(patient.getString("condition"));
 	}
-	
+
+	public JSONObject getPatientJSON() {
+		return new JSONObject(this.toString());
+	}
+
+	public Map<String, String> getPatientMap(){
+		Map<String, String> patientMap = new HashMap<>();
+		patientMap.put("fName", getfName());
+		patientMap.put("lName", getlName());
+		patientMap.put("city", getCity());
+		patientMap.put("state", getState());
+		patientMap.put("country", getCountry());
+		patientMap.put("phone", getPhone());
+		patientMap.put("condition", getCondition());
+
+		return patientMap;
+	}
+
+	@Override
+	public String toString() {
+		return "{ fName: " + fName + " , lName: " + lName + " , city: " + city + " , state: " +
+				state + "," + " country: " + country + ", phone: " + phone +
+				", condition: " + condition + " }";
+	}
+
 	public String getCondition() {
 		return condition;
 	}
@@ -79,13 +102,6 @@ public class Patient {
 		this.phone = phone;
 	}
 	
-	@Override
-	public String toString() {
-		return "{ fName: " + fName + " , lName: " + lName + " , city: " + city + " , state: " +
-				state + "," + " country: " + country + ", phone: " + phone +
-				", condition: " + condition + " }";
-	}
-	
 	private String fName;
 	private String lName;
 	private String city;
@@ -95,11 +111,14 @@ public class Patient {
 	private String condition;
 	
 	public static void main(String[] args) {
+		
 		Patient p = new Patient("Hye44", "Turner526", "Saugus", "Massachusetts", "US", "555-533-6976");
 		System.out.println(p);
 		JSONObject pJson = p.getPatientJSON();
 		System.out.println(pJson.getString("condition"));
 		Patient pCopy = new Patient(pJson);
 		System.out.println(pCopy);
+		System.out.println(pCopy.getPatientMap().get("fName"));
+
 	}
 }
