@@ -24,6 +24,18 @@ public class Patient {
 		this.setPhone(phone);
 		this.setCondition(CONDITIONS[conditionIndex]);
 	}
+	
+	public Patient(String fName, String lName, String city, String state,
+			String country, String phone, String condition) {
+		
+		this.setfName(fName);
+		this.setlName(lName);
+		this.setCity(city);
+		this.setState(state);
+		this.setCountry(country);
+		this.setPhone(phone);
+		this.setCondition(condition);
+	}
 
 	public Patient(JSONObject patient) throws JSONException{
 			this.setfName(patient.getString("fName"));
