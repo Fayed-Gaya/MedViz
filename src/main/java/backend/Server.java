@@ -84,7 +84,9 @@ public class Server {
 
 	public static void main(String[] args) {
 		Server server = new Server();
-		Patient dave = new Patient("Dave", "Hauss", "avon", "ct", "usa", "555-555-5555", "1989-07-18", "diabetes");
+		Patient dave = new Patient("Dave", "Hauss", "avon", "ct", "usa",
+				"555-555-5555", "1989-07-18", "diabetes"
+				);
 		JSONObject daveJSON = dave.getPatientJSON();
 		server.create(daveJSON);
 		server.read("hauss");
