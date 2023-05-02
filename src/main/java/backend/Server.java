@@ -58,10 +58,10 @@ public class Server {
 	}
 	
 	public void create(String fName, String lName, String city, String state,
-					String country, String phone, String condition) {
+					String country, String phone, String condition, String DOB) {
 		
 		Patient patient = new Patient(fName, lName, city, state, country,
-					phone, condition);
+					phone, condition, DOB);
 		this.create(patient);
 	}
 	
@@ -84,10 +84,10 @@ public class Server {
 
 	public static void main(String[] args) {
 		Server server = new Server();
-		//server.create("dave", "hauss", "avon", "ct", "usa", "555-555-5555", "diabetes");
+		Patient dave = new Patient("Dave", "Hauss", "avon", "ct", "usa", "555-555-5555", "1989-07-18", "diabetes");
+		JSONObject daveJSON = dave.getPatientJSON();
+		server.create(daveJSON);
 		server.read("hauss");
-		
-
 	}
 
 }
