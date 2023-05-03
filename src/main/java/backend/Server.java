@@ -125,7 +125,6 @@ public class Server {
 				String DOB = doc.getString("DOB");
 				Patient curPatient = new Patient(fName, lName, city, state, country, phone, DOB);
 				queryRes.add(curPatient);
-				System.out.println(doc.getId());
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -144,9 +143,9 @@ public class Server {
 				);
 		JSONObject daveJSON = dave.getPatientJSON();
 		//server.create(daveJSON);
-		queryRes = server.readOneField("lName", "hauss", "eq");
+		queryRes = server.readOneField("DOB", "1980-10", "geq");
 		for(Patient patient: queryRes) {
-			System.out.println(patient);
+			System.out.println(patient.getDOB());
 		}
 	}
 
