@@ -1,5 +1,7 @@
 package backend;
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -20,13 +22,20 @@ import java.util.List;
 public class Test {
 	public static void main(String[] args) {
 		String projectId = "medviz-384013";
+		FileInputStream refreshToken = null;
+		String path = "/Users/dave/Desktop/NYU_Tandon/Spring 2023/Java/Final Project/dev key/medviz-384013-519ee7657744.json";
+		try {
+			refreshToken = new FileInputStream(path);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 
 		Firestore db = null;
 		FirestoreOptions firestoreOptions = null;
 		try {
 			firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
 			    .setProjectId(projectId)
-			    .setCredentials(GoogleCredentials.getApplicationDefault())
+			    .setCredentials(GoogleCredentials.fromStream(refreshToken))
 			    .build();
 		} catch (IOException e) {
 			e.printStackTrace();

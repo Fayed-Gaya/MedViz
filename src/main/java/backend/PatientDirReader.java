@@ -36,7 +36,7 @@ public class PatientDirReader {
 			e.printStackTrace();
 		}
 			db = firestoreOptions.getService();
-		
+
 		//read in all patient JSONs from EHRs directory, parse info and create patient objects to insert into DB
 		try (DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.json")) {
 		    for (Path p : stream) {
@@ -58,6 +58,8 @@ public class PatientDirReader {
 				//parse patient info
 				JSONObject jsonObj = new JSONObject(sb.toString());
 				JSONObject resource = jsonObj.getJSONArray("entry").getJSONObject(0).getJSONObject("resource");
+				String dob = resource.getString("birthDate");
+
 				JSONObject name = resource.getJSONArray("name").getJSONObject(0);
 				String given = name.getJSONArray("given").get(0).toString();
 				String family = name.getString("family");
@@ -69,8 +71,8 @@ public class PatientDirReader {
 
 				JSONObject telecom = resource.getJSONArray("telecom").getJSONObject(0);
 				String phone = telecom.getString("value");
-				
-				patient = new Patient(given, family, city, state, country, phone);
+								
+				patient = new Patient(given, family, city, state, country, phone, dob);
 				
 				String docName = patient.getfName() + "_" + patient.getlName();
 				ApiFuture<WriteResult> future = db.collection("patients").document(docName).set(patient.getPatientMap());
@@ -80,13 +82,10 @@ public class PatientDirReader {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
 					e.printStackTrace();
-				}
-				
+				}	
 		   }
-
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
 	}
-
 }

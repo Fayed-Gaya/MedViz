@@ -12,7 +12,7 @@ public class Patient {
 			};
 
 	public Patient(String fName, String lName, String city, String state,
-					String country, String phone) {
+					String country, String phone, String DOB) {
 		Random rand = new Random();
 		int conditionIndex = rand.nextInt(10);
 
@@ -22,7 +22,21 @@ public class Patient {
 		this.setState(state);
 		this.setCountry(country);
 		this.setPhone(phone);
+		this.setDOB(DOB);
 		this.setCondition(CONDITIONS[conditionIndex]);
+	}
+	
+	public Patient(String fName, String lName, String city, String state,
+			String country, String phone, String DOB, String condition) {
+		
+		this.setfName(fName);
+		this.setlName(lName);
+		this.setCity(city);
+		this.setState(state);
+		this.setCountry(country);
+		this.setPhone(phone);
+		this.setDOB(DOB);
+		this.setCondition(condition);
 	}
 
 	public Patient(JSONObject patient) throws JSONException{
@@ -33,6 +47,7 @@ public class Patient {
 			this.setCountry(patient.getString("country"));
 			this.setPhone(patient.getString("phone"));
 			this.setCondition(patient.getString("condition"));
+			this.setDOB(patient.getString("DOB"));
 	}
 
 	public JSONObject getPatientJSON() {
@@ -48,6 +63,7 @@ public class Patient {
 		patientMap.put("country", getCountry());
 		patientMap.put("phone", getPhone());
 		patientMap.put("condition", getCondition());
+		patientMap.put("DOB", getDOB());
 
 		return patientMap;
 	}
@@ -56,7 +72,7 @@ public class Patient {
 	public String toString() {
 		return "{ fName: " + fName + " , lName: " + lName + " , city: " + city + " , state: " +
 				state + "," + " country: " + country + ", phone: " + phone +
-				", condition: " + condition + " }";
+				", condition: " + condition + ", DOB: " + DOB + " }";
 	}
 
 	public String getCondition() {
@@ -102,17 +118,26 @@ public class Patient {
 		this.phone = phone;
 	}
 	
+	public String getDOB() {
+		return DOB;
+	}
+
+	public void setDOB(String DOB) {
+		this.DOB = DOB;
+	}
+
 	private String fName;
 	private String lName;
 	private String city;
 	private String state;
 	private String country;
 	private String phone;
+	private String DOB;	//Format: YYYY-MM-DD
 	private String condition;
 	
 	public static void main(String[] args) {
 		
-		Patient p = new Patient("Hye44", "Turner526", "Saugus", "Massachusetts", "US", "555-533-6976");
+		Patient p = new Patient("Hye44", "Turner526", "Saugus", "Massachusetts", "US", "555-533-6976", "1985-1-1");
 		System.out.println(p);
 		JSONObject pJson = p.getPatientJSON();
 		System.out.println(pJson.getString("condition"));
