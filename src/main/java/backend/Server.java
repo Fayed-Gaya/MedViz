@@ -22,6 +22,7 @@ public class Server {
 	private final String PROJECTID = "medviz-384013";
 
 	public Server() {
+		//initialize DB connection
 		FirestoreOptions firestoreOptions = null;
 		try {
 			firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
@@ -38,8 +39,9 @@ public class Server {
 		/*
 		 * switch statement based on type handle c/r/u/d/a separately
 		 * type c:
-		 * 		check numFields, parses JSON and passes argument to appropriate create method
+		 * 		parse JSON and pass arguments to read method 
 		 * type r:
+		 * 		check numFields, parses JSON and passes argument to appropriate read method
 		 * type u:
 		 * type d:
 		 */
@@ -47,6 +49,33 @@ public class Server {
 	}
 
 	public void create(Patient patient) {
+		//check if patient record already exists
+		ApiFuture<QuerySnapshot> query = null;
+		CollectionReference patients = db.collection("patients");
+		query = patients.whereEqualTo("fName", patient.getfName()).whereEqualTo("lName", patient.getlName()).get();
+		QuerySnapshot document = null;
+		try {
+			document = query.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		if(!document.isEmpty()) {
+			System.err.println("Record already exists:");
+			try {
+				for (DocumentSnapshot doc : query.get().getDocuments()) {
+					System.err.println(doc.getId());
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			return;
+		}
+		
+		//write new record to DB
 		String docName = patient.getfName() + "_" + patient.getlName();
 		ApiFuture<WriteResult> future = db.collection("patients").document(docName).set(patient.getPatientMap());
 		try {
@@ -84,6 +113,7 @@ public class Server {
 		Query query = null;
 		ApiFuture<QuerySnapshot> querySnapshot = null;
 
+		//read op variable to decide how to handle query
 		switch(op) {
 		case "eq":
 			query = patients.whereEqualTo(field, val);
@@ -114,6 +144,7 @@ public class Server {
 			return null;
 		}
 
+		//create patient object from each query result, add to queryRes ArrayList
 		try {
 			for (DocumentSnapshot doc : querySnapshot.get().getDocuments()) {
 				String fName = doc.getString("fName");
@@ -138,15 +169,17 @@ public class Server {
 	public static void main(String[] args) {
 		ArrayList<Patient> queryRes = new ArrayList<>();
 		Server server = new Server();
-		Patient dave = new Patient("Dave", "Hauss", "avon", "ct", "usa",
+		Patient dave = new Patient("Becky", "Hauss", "avon", "ct", "usa",
 				"555-555-5555", "1989-07-18", "diabetes"
 				);
 		JSONObject daveJSON = dave.getPatientJSON();
-		//server.create(daveJSON);
+		server.create(daveJSON);
+		/*
 		queryRes = server.readOneField("DOB", "1980-10", "geq");
 		for(Patient patient: queryRes) {
 			System.out.println(patient.getDOB());
 		}
+		*/
 	}
 
 }
