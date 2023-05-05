@@ -4,18 +4,40 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.net.Socket;
+import java.io.IOException;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
 
-public class Main implements ActionListener{
-	// Main Page
+//import javax.swing.JButton;
+//import javax.swing.JFrame;
+//import javax.swing.JLabel;
+//import javax.swing.JMenu;
+//import javax.swing.JMenuBar;
+//import javax.swing.JMenuItem;
+//import javax.swing.JPasswordField;
+//import javax.swing.JTextField;
+
+import javax.swing.*;
+
+
+public class Main extends JFrame implements ActionListener, Runnable{
+	
+	// Server connection setup
+		private static int nextClientID = 1;
+		private int clientID;
+		
+		DataOutputStream toServer = null;
+		DataInputStream fromServer = null;
+		private Socket socket;
+		private boolean connectionStatus = false;
+		
+		
+	// GUI setup
+		// Create main frame
 	JFrame frame = new JFrame();
 	
-	// Login Page Variables
 	JButton loginButton = new JButton("Login");
 	JButton resetButton = new JButton("Reset");
 	JButton signupButton = new JButton("Sign Up");
@@ -28,6 +50,21 @@ public class Main implements ActionListener{
 	JLabel messageLabel = new JLabel();
 	
 	Main(){
+		super("Med Viz");
+		// Initialize client ID
+		this.clientID = nextClientID++;
+		
+		// Create Menu bar
+		JMenuBar menuBar = new JMenuBar(); // Create menu bar
+		JMenu menu = new JMenu("File"); // Create file menu
+		JMenuItem connectItem = new JMenuItem("Reconnect");
+		connectItem.addActionListener(new openConnection());
+		menu.add(connectItem);
+		JMenuItem exitItem = new JMenuItem("Exit"); 
+		exitItem.addActionListener((e) -> System.exit(0));
+		menu.add(exitItem);
+		menuBar.add(menu); // Add File menu to menu bar
+		frame.setJMenuBar(menuBar);
 		
 		// Initialize Login Page
 		paintLoginPage();
@@ -37,8 +74,8 @@ public class Main implements ActionListener{
 		frame.setLayout(null);
 		frame.setVisible(true);
 		
-		paintLoginPage();
-		
+		Thread t = new Thread(this);
+		t.start();
 	}
 	
 	private void paintLoginPage(){
@@ -189,14 +226,50 @@ public class Main implements ActionListener{
 		
 	}
 	
+	
+	class openConnection implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try {
+				socket = new Socket("localhost", 9898);
+//				chatHistory.append("\nReconnected to server.");
+				
+				connectionStatus = true;
+				
+			}
+			catch (IOException error1) {
+				error1.printStackTrace();
+			}
+		}
+		
+	}
+	
+	public void run() {
+		
+		try {
+			socket = new Socket("localhost", 9898);
+			System.out.println("Connected to server.");
+			
+			// Create an output stream to write to the server
+			toServer = new DataOutputStream(socket.getOutputStream());
+			// Create an input stream to receive data from the server
+			fromServer = new DataInputStream(socket.getInputStream());
+			
+			connectionStatus = true;
+			
+			while (connectionStatus) {
+				
+			}
+		} 
+		catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		
+	}
 
 	public static void main(String[] args) {
 		Main gui = new Main();
 		
-//		IDandPasswords idandPasswords = new IDandPasswords();
-//		
-//		
-//		
-//		LoginPage loginPage = new LoginPage(idandPasswords.getLoginInfo());
 	}
 } 
