@@ -17,6 +17,7 @@ public class LoginPage implements ActionListener{
 	JFrame frame = new JFrame();
 	JButton loginButton = new JButton("Login");
 	JButton resetButton = new JButton("Reset");
+	JButton signupButton = new JButton("Sign Up");
 	JTextField userIDField = new JTextField();
 	JPasswordField userPasswordField = new JPasswordField();
 	JLabel userIDLabel = new JLabel("userID:");
@@ -35,11 +36,14 @@ public class LoginPage implements ActionListener{
 		userIDField.setBounds(125, 100, 200, 25);
 		userPasswordField.setBounds(125, 150, 200, 25);
 		
-		loginButton.setBounds(125, 200, 100, 25);
+		loginButton.setBounds(80, 200, 100, 25);
 		loginButton.addActionListener(this);
 		
-		resetButton.setBounds(225, 200, 100, 25);
+		resetButton.setBounds(180, 200, 100, 25);
 		resetButton.addActionListener(this);
+		
+		signupButton.setBounds(280, 200, 100, 25);
+		signupButton.addActionListener(this);
 		
 		frame.add(userIDLabel);
 		frame.add(userPasswordLabel);
@@ -48,6 +52,7 @@ public class LoginPage implements ActionListener{
 		frame.add(userPasswordField);
 		frame.add(loginButton);
 		frame.add(resetButton);
+		frame.add(signupButton);
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(420, 420);
@@ -88,6 +93,11 @@ public class LoginPage implements ActionListener{
 				messageLabel.setText("Username not found");
 			}
 
+		}
+		
+		if(e.getSource()==signupButton) {
+			frame.dispose();
+			SignupPage signupPage = new SignupPage(logininfo);
 		}
 		
 		
