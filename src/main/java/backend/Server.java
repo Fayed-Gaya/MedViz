@@ -18,6 +18,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -87,11 +88,12 @@ public class Server extends JFrame implements Runnable{
 
 	public void processRequest(String req) {
 		/*
-		 * switch statement based on type handle c/r/u/d/a separately
+		 * initialize String response = null
+		 * switch statement based on type handle c/r/u/d/a separately, each function returns a string
 		 * type c:
 		 * 		parse JSON and pass arguments to read method 
 		 * type r:
-		 * 		check numFields, parses JSON and passes argument to appropriate read method
+		 * 		check numFields, parses JSON and passes argument to appropriate read method. returns string of patient records (JSONArray of JSONObjects)
 		 * type u:
 		 * type d:
 		 */
@@ -157,8 +159,7 @@ public class Server extends JFrame implements Runnable{
 		this.create(patient);
 	}
 
-	public ArrayList<Patient> readOneField(String field, String val, String op) {
-		ArrayList<Patient> queryRes = new ArrayList<>();
+	public String readOneField(String field, String val, String op) {
 		CollectionReference patients = db.collection("patients");
 		Query query = null;
 		ApiFuture<QuerySnapshot> querySnapshot = null;
@@ -193,8 +194,8 @@ public class Server extends JFrame implements Runnable{
 			System.err.println("Invalid query operator");
 			return null;
 		}
-
-		//create patient object from each query result, add to queryRes ArrayList
+		StringBuilder JSONArrayString = new StringBuilder("[");
+		//create patient object from each query result, add to queryRes JSONArrayString
 		try {
 			for (DocumentSnapshot doc : querySnapshot.get().getDocuments()) {
 				String fName = doc.getString("fName");
@@ -205,15 +206,18 @@ public class Server extends JFrame implements Runnable{
 				String phone = doc.getString("phone");
 				String DOB = doc.getString("DOB");
 				Patient curPatient = new Patient(fName, lName, city, state, country, phone, DOB);
-				queryRes.add(curPatient);
+				JSONArrayString.append(curPatient);
+				JSONArrayString.append(", ");
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}	
+		
+		JSONArrayString.append("]");
 
-		return queryRes;
+		return JSONArrayString.toString();
 	}
 	
 	class HandleAClient implements Runnable{
@@ -302,6 +306,7 @@ public class Server extends JFrame implements Runnable{
 	public static void main(String[] args) {
 		
 		Server server = new Server();
+		server.readOneField("lName", "Hauss", "eq");
 		
 //		ArrayList<Patient> queryRes = new ArrayList<>();
 //		Server server = new Server();
