@@ -100,7 +100,7 @@ public class Server extends JFrame implements Runnable{
 
 	}
 
-	public void create(Patient patient) {
+	public String create(Patient patient) {
 		//check if patient record already exists
 		ApiFuture<QuerySnapshot> query = null;
 		CollectionReference patients = db.collection("patients");
@@ -124,7 +124,7 @@ public class Server extends JFrame implements Runnable{
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-			return;
+			return null;
 		}
 		
 		//write new record to DB
@@ -137,26 +137,29 @@ public class Server extends JFrame implements Runnable{
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
-
+		return patient.toString();
 	}
 
-	public void create(JSONObject patient) {
+	public String create(JSONObject patient) {
 		Patient p = null;
 		try {
 			p = new Patient(patient);
 			this.create(p);
+			return p.toString();
 		}
 		catch(JSONException e){
 			System.err.println("Invalid JSON: " + e.getMessage());
+			return null;
 		}
 	}
 
-	public void create(String fName, String lName, String city, String state,
+	public String create(String fName, String lName, String city, String state,
 					String country, String phone, String condition, String DOB) {
 
 		Patient patient = new Patient(fName, lName, city, state, country,
 					phone, condition, DOB);
 		this.create(patient);
+		return patient.toString();
 	}
 
 	public String readOneField(String field, String val, String op) {
@@ -219,6 +222,40 @@ public class Server extends JFrame implements Runnable{
 
 		return JSONArrayString.toString();
 	}
+	
+	public String delete(String fName, String lName) {
+		//check if patient record exists
+		ApiFuture<QuerySnapshot> query = null;
+		CollectionReference patients = db.collection("patients");
+		query = patients.whereEqualTo("fName", fName).whereEqualTo("lName", lName).get();
+		QuerySnapshot document = null;
+		try {
+			document = query.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		if(document.isEmpty()) {
+			System.err.println("Record does not exist");
+			return null;
+		}
+		
+		//if it does, delete it
+		ApiFuture<WriteResult> writeResult = db.collection("patients").document(fName + "_" + lName).delete();
+		try {
+			System.out.println("Update time : " + writeResult.get().getUpdateTime());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			return null;
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+			return null;
+		}
+		
+		return fName + " " + lName + " deleted";
+	}
+		
 	
 	class HandleAClient implements Runnable{
 		private Socket socket; // Connected socket
@@ -306,21 +343,25 @@ public class Server extends JFrame implements Runnable{
 	public static void main(String[] args) {
 		
 		Server server = new Server();
-		server.readOneField("lName", "Hauss", "eq");
+		/*
+		String res = server.readOneField("lName", "Hauss", "eq");
+		JSONArray ja = new JSONArray(res);
+		for(Object jo: ja) {
+			System.out.println(((JSONObject) jo).getString("lName"));
+		}
+		*/
 		
-//		ArrayList<Patient> queryRes = new ArrayList<>();
-//		Server server = new Server();
-//		Patient dave = new Patient("Fayed", "2", "avon", "ct", "usa",
-//				"555-555-5555", "1989-07-18", "diabetes"
-//				);
-//		JSONObject daveJSON = dave.getPatientJSON();
-//		server.create(daveJSON);
-//
-//		queryRes = server.readOneField("DOB", "1980-10", "geq");
-//		for(Patient patient: queryRes) {
-//			System.out.println(patient.getDOB());
-//		}
-
+		
+		Patient dave = new Patient("KilHwan", "Name", "avon", "ct", "usa",
+				"555-555-5555", "1989-07-18", "diabetes"
+				);
+		JSONObject daveJSON = dave.getPatientJSON();
+		String res = server.create(daveJSON);
+		System.out.println(res);
+		
+		
+		String response = server.delete("KilHwan", "Name");
+		System.out.println(response);
 	}
 
 }
