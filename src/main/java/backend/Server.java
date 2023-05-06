@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
@@ -223,6 +224,38 @@ public class Server extends JFrame implements Runnable{
 		return JSONArrayString.toString();
 	}
 	
+	public String update(String fName, String lName, String field, String val) {
+		//check if patient record exists
+		ApiFuture<QuerySnapshot> query = null;
+		CollectionReference patients = db.collection("patients");
+		query = patients.whereEqualTo("fName", fName).whereEqualTo("lName", lName).get();
+		QuerySnapshot document = null;
+		try {
+			document = query.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		if(document.isEmpty()) {
+			System.err.println("Record does not exist");
+			return null;
+		}
+		
+		DocumentReference docRef = db.collection("patients").document(fName + "_" + lName);
+		ApiFuture<WriteResult> future = docRef.update(field, val);
+		WriteResult result = null;
+		try {
+			result = future.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		
+		return fName + " " + lName + "'s " + field + " updated to " + val;
+	}
+	
 	public String delete(String fName, String lName) {
 		//check if patient record exists
 		ApiFuture<QuerySnapshot> query = null;
@@ -351,16 +384,17 @@ public class Server extends JFrame implements Runnable{
 		}
 		*/
 		
-		
-		Patient dave = new Patient("KilHwan", "Name", "avon", "ct", "usa",
+		Patient pat = new Patient("New", "Patient", "avon", "ct", "usa",
 				"555-555-5555", "1989-07-18", "diabetes"
 				);
-		JSONObject daveJSON = dave.getPatientJSON();
-		String res = server.create(daveJSON);
+		JSONObject patJSON = pat.getPatientJSON();
+		String res = server.create(patJSON);
 		System.out.println(res);
 		
+		res = server.update("New", "Patient", "city", "ohio");
+		System.out.println(res);
 		
-		String response = server.delete("KilHwan", "Name");
+		String response = server.delete("New", "Patient");
 		System.out.println(response);
 	}
 
