@@ -140,10 +140,8 @@ public class Server extends JFrame implements Runnable{
 			return response;
 		default:
 			System.err.println("Invalid JSON request");
-			return null;
-			
+			return null;	
 		}
-
 	}
 	
 	public String signup(String username, Object pw) {
@@ -208,6 +206,9 @@ public class Server extends JFrame implements Runnable{
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			e.printStackTrace();
+		}
+		if(user.isEmpty()) {
+			return "{verified: false}";
 		}
 		
 		if(BCrypt.checkpw((String) pw, user.get(0).getString("password"))) {
@@ -496,7 +497,7 @@ public class Server extends JFrame implements Runnable{
 		
 		Server server = new Server();
 		
-		String response = server.processRequest("{type: l, username: user2, pw: user}");
+		String response = server.processRequest("{type: l, username: user3, pw: user}");
 		System.out.println(response);		
 
 		/*
