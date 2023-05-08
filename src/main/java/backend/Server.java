@@ -495,13 +495,12 @@ public class Server extends JFrame implements Runnable{
 	public static void main(String[] args) {
 		
 		Server server = new Server();
-		String response = server.login("user", "user");
-		System.out.println(response);		
-		response = server.login("admin", "admin");
-		System.out.println(response);		
 		
+		String response = server.processRequest("{type: l, username: user2, pw: user}");
+		System.out.println(response);		
+
 		/*
-		String response = server.processRequest("{ type: c, fName: Paul, lName: Verhoeven, city: nyc, state: ohio, country: usa, phone: 555-555-5555, condition: diabetes, DOB: 1999-01-01 }");
+		response = server.processRequest("{ type: c, fName: Paul, lName: Verhoeven, city: nyc, state: ohio, country: usa, phone: 555-555-5555, condition: diabetes, DOB: 1999-01-01 }");
 		System.out.println(response);
 		response = server.processRequest("{type: r, field: fName, val: Paul, op: eq}");
 		System.out.println(response);
