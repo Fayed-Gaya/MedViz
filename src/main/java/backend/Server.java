@@ -538,12 +538,14 @@ public class Server extends JFrame implements Runnable{
 	public static void main(String[] args) {
 		
 		Server server = new Server();
+		/*
 		String response = server.processRequest("{type: a, low: 1970, high: 2020, condition: brain damage}");
 		System.out.println(response);
+		*/
 		
+		String response = server.processRequest("{type: s, username: user2, pw: user2}");
+		System.out.println(response);	
 		/*
-		response = server.processRequest("{type: l, username: user3, pw: user}");
-		System.out.println(response);		
 		response = server.processRequest("{ type: c, fName: Paul, lName: Verhoeven, city: nyc, state: ohio, country: usa, phone: 555-555-5555, condition: diabetes, DOB: 1999-01-01 }");
 		System.out.println(response);
 		response = server.processRequest("{type: r, field: fName, val: Paul, op: eq}");
@@ -559,8 +561,8 @@ public class Server extends JFrame implements Runnable{
 		for(Object jo: ja) {
 			System.out.println(((JSONObject) jo).getString("lName"));
 		}
-		
-		
+		*/
+		/*
 		Patient pat = new Patient("New", "Patient", "avon", "ct", "usa",
 				"555-555-5555", "1989-07-18", "diabetes"
 				);
