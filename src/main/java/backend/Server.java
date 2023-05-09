@@ -538,7 +538,7 @@ public class Server extends JFrame implements Runnable{
 	public static void main(String[] args) {
 		
 		Server server = new Server();
-		String response = server.processRequest("{type: a, low: 2000, high: 2020, condition: brain damage}");
+		String response = server.processRequest("{type: a, low: 1970, high: 2020, condition: brain damage}");
 		System.out.println(response);
 		
 		/*
