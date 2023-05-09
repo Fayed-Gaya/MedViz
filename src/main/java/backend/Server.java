@@ -136,7 +136,7 @@ public class Server extends JFrame implements Runnable{
 			response = delete(request.getString("fName"), request.getString("lName"));
 			return response;
 		case("a"):
-			response = "aggregate";
+			response = aggregate(request.getInt("low"), request.getInt("high"), request.getString("condition"));
 			return response;
 		default:
 			System.err.println("Invalid JSON request");
@@ -408,8 +408,50 @@ public class Server extends JFrame implements Runnable{
 		
 		return fName + " " + lName + " deleted";
 	}
-		
 	
+	public String aggregate(Integer low, Integer high, String condition) {
+		CollectionReference patients = db.collection("patients");
+		Query query = patients.whereGreaterThan("DOB", low.toString()).whereLessThan("DOB", high.toString());
+		ApiFuture<QuerySnapshot> querySnapshot = query.get();
+		Map<String, Integer> resMap = new HashMap<>();
+		
+		try {
+			for(DocumentSnapshot doc: querySnapshot.get().getDocuments()) {
+				String year = doc.getString("DOB").substring(0, 4);
+				if(doc.getString("condition").equals(condition)) {
+					if(resMap.containsKey(year)) {
+						int count = resMap.get(year);
+						count++;
+						resMap.put(year, count);
+					}
+					else {
+						resMap.put(year, 1);
+					}
+				}
+			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		
+		StringBuilder response = new StringBuilder("{ ");		
+		for(Integer i = low; i < high; i++) {
+			response.append(i);
+			response.append(": ");
+			if(resMap.containsKey(i.toString())) {
+				response.append(resMap.get(i.toString()));
+			}
+			else {
+				response.append("0");
+			}
+			response.append(", ");
+		}
+		response.append("}");
+		return response.toString();
+	}
+	
+
 	class HandleAClient implements Runnable{
 		private Socket socket; // Connected socket
 		private int clientNum;
@@ -496,11 +538,12 @@ public class Server extends JFrame implements Runnable{
 	public static void main(String[] args) {
 		
 		Server server = new Server();
+		String response = server.processRequest("{type: a, low: 2000, high: 2020, condition: brain damage}");
+		System.out.println(response);
 		
-		String response = server.processRequest("{type: l, username: user3, pw: user}");
-		System.out.println(response);		
-
 		/*
+		response = server.processRequest("{type: l, username: user3, pw: user}");
+		System.out.println(response);		
 		response = server.processRequest("{ type: c, fName: Paul, lName: Verhoeven, city: nyc, state: ohio, country: usa, phone: 555-555-5555, condition: diabetes, DOB: 1999-01-01 }");
 		System.out.println(response);
 		response = server.processRequest("{type: r, field: fName, val: Paul, op: eq}");
