@@ -9,6 +9,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -21,6 +25,7 @@ import javax.swing.JTextArea;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mindrot.jbcrypt.BCrypt;
 
 import com.google.api.core.ApiFuture;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -30,6 +35,7 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 
@@ -84,22 +90,138 @@ public class Server extends JFrame implements Runnable{
 		this.setVisible(true);
 		Thread main = new Thread(this);
 		main.start();
+
+	}
+	
+	public void makeAdmin() {
+		String hashedPassword = BCrypt.hashpw("admin", BCrypt.gensalt());
+		DocumentReference docRef = db.collection("users").document("admin");
+		Map<String, Object> userData = new HashMap<>();
+		userData.put("username", "admin");
+		userData.put("password", hashedPassword);
+		userData.put("admin", true);
+		ApiFuture<WriteResult> result = docRef.set(userData);
+		try {
+			System.out.println("Update time : " + result.get().getUpdateTime());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public String processRequest(String req) {
+		//takes request as a string, casts to JSON and parses before calling CRUDA method, returns response as string
+		String response = null;
+		JSONObject request = new JSONObject(req);
+		switch(request.getString("type")) {
+		case("s"):
+			response = signup(request.getString("username"), request.getString("pw"));
+			return response;
+		case("l"):
+			response = login(request.getString("username"), request.getString("pw"));
+			return response;
+		case("c"):
+			response = create(request.getString("fName"), request.getString("lName"), request.getString("city"),
+					request.getString("state"), request.getString("country"), request.getString("phone"),
+					request.getString("condition"), request.getString("DOB"));
+			return response;
+		case("r"):
+			response = read(request.getString("field"), request.getString("val"), request.getString("op"));
+			return response;
+		case("u"):
+			response = update(request.getString("fName"), request.getString("lName"), request.getString("field"), request.getString("val"));
+			return response;
+		case("d"):
+			response = delete(request.getString("fName"), request.getString("lName"));
+			return response;
+		case("a"):
+			response = "aggregate";
+			return response;
+		default:
+			System.err.println("Invalid JSON request");
+			return null;	
+		}
+	}
+	
+	public String signup(String username, Object pw) {
+		String response = null;
+		//check if user already exists
+		ApiFuture<QuerySnapshot> query = null;
+		CollectionReference users = db.collection("users");
+		query = users.whereEqualTo("username", username).get();
+		QuerySnapshot document = null;
+		try {
+			document = query.get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		if(!document.isEmpty()) {
+			System.err.println("User already exists:");
+			try {
+				for (DocumentSnapshot doc : query.get().getDocuments()) {
+					System.err.println(doc.getId());
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
 		
+		
+		String hashedPassword = BCrypt.hashpw((String)pw, BCrypt.gensalt());
+		DocumentReference docRef = db.collection("users").document(username);
+		Map<String, Object> userData = new HashMap<>();
+		userData.put("username", username);
+		userData.put("password", hashedPassword);
+		userData.put("admin", false);
+		ApiFuture<WriteResult> result = docRef.set(userData);
+		try {
+			System.out.println("Update time : " + result.get().getUpdateTime());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		
+		response = "{username: " + username + ", verified: true, " + "admin: false }";
+		return response;
+	}
+	
+	public String login(String username, Object pw) {
+		String response = null;
+		
+		ApiFuture<QuerySnapshot> query = null;
+		CollectionReference users = db.collection("users");
+		query = users.whereEqualTo("username", username).get();
+	
+		List<QueryDocumentSnapshot> user = null;
+		try {
+			user = query.get().getDocuments();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
+		if(user.isEmpty()) {
+			return "{verified: false}";
+		}
+		
+		if(BCrypt.checkpw((String) pw, user.get(0).getString("password"))) {
+			response = "{username: " + user.get(0).getString("username") + ", verified: true, " + "admin: " + user.get(0).getBoolean("admin") + " }";
+		}
+		else {
+			response = "{verified: false}";
+		}
+		
+		//return admin
+		return response;
 	}
 
-	public void processRequest(String req) {
-		/*
-		 * initialize String response = null
-		 * switch statement based on type handle c/r/u/d/a separately, each function returns a string
-		 * type c:
-		 * 		parse JSON and pass arguments to read method 
-		 * type r:
-		 * 		check numFields, parses JSON and passes argument to appropriate read method. returns string of patient records (JSONArray of JSONObjects)
-		 * type u:
-		 * type d:
-		 */
-
-	}
 
 	public String create(Patient patient) {
 		//check if patient record already exists
@@ -145,8 +267,7 @@ public class Server extends JFrame implements Runnable{
 		Patient p = null;
 		try {
 			p = new Patient(patient);
-			this.create(p);
-			return p.toString();
+			return create(p);
 		}
 		catch(JSONException e){
 			System.err.println("Invalid JSON: " + e.getMessage());
@@ -158,12 +279,11 @@ public class Server extends JFrame implements Runnable{
 					String country, String phone, String condition, String DOB) {
 
 		Patient patient = new Patient(fName, lName, city, state, country,
-					phone, condition, DOB);
-		this.create(patient);
-		return patient.toString();
+					phone, DOB, condition);
+		return create(patient);
 	}
 
-	public String readOneField(String field, String val, String op) {
+	public String read(String field, String val, String op) {
 		CollectionReference patients = db.collection("patients");
 		Query query = null;
 		ApiFuture<QuerySnapshot> querySnapshot = null;
@@ -376,13 +496,27 @@ public class Server extends JFrame implements Runnable{
 	public static void main(String[] args) {
 		
 		Server server = new Server();
+		
+		String response = server.processRequest("{type: l, username: user3, pw: user}");
+		System.out.println(response);		
+
 		/*
-		String res = server.readOneField("lName", "Hauss", "eq");
+		response = server.processRequest("{ type: c, fName: Paul, lName: Verhoeven, city: nyc, state: ohio, country: usa, phone: 555-555-5555, condition: diabetes, DOB: 1999-01-01 }");
+		System.out.println(response);
+		response = server.processRequest("{type: r, field: fName, val: Paul, op: eq}");
+		System.out.println(response);
+		response = server.processRequest("{type: u, fName: Paul, lName: Verhoeven, field: country, val: ohio}");
+		System.out.println(response);
+		response = server.processRequest("{type: d, fName: Paul, lName: Verhoeven}");
+		System.out.println(response);
+		*/
+		/*
+		String res = server.read("lName", "Hauss", "eq");
 		JSONArray ja = new JSONArray(res);
 		for(Object jo: ja) {
 			System.out.println(((JSONObject) jo).getString("lName"));
 		}
-		*/
+		
 		
 		Patient pat = new Patient("New", "Patient", "avon", "ct", "usa",
 				"555-555-5555", "1989-07-18", "diabetes"
@@ -396,6 +530,7 @@ public class Server extends JFrame implements Runnable{
 		
 		String response = server.delete("New", "Patient");
 		System.out.println(response);
+		*/
 	}
 
 }
