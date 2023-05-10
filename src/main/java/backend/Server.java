@@ -474,17 +474,21 @@ public class Server extends JFrame implements Runnable{
 		
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
+			DataInputStream inputFromClient = null;
+			DataOutputStream outputToClient = null;
 			try {
 				// Create input and output streams
-				DataInputStream inputFromClient = new DataInputStream(socket.getInputStream());
-//				DataOutputStream outputToClient = new DataOutputStream(socket.getOutputStream());
+				inputFromClient = new DataInputStream(socket.getInputStream());
+				outputToClient = new DataOutputStream(socket.getOutputStream());
 				
 				while (true) {
-					
+					try {
 					// Receive message from client
-					String inMessage = clientNum + ":" + inputFromClient.readUTF();
+					String inMessage = inputFromClient.readUTF();
 					System.out.println("Server received message: " + inMessage);
+					String response = processRequest(inMessage);
+					System.out.println(response);
+					outputToClient.writeUTF(response);
 					
 //					// Broadcast the message
 //					broadcastMessage(inMessage);
@@ -492,6 +496,14 @@ public class Server extends JFrame implements Runnable{
 //					messageBroadCast.writeUTF(inMessage);
 					
 //					outputToClient.writeUTF(inMessage);
+					}
+					catch(IOException e) {
+						try {
+							inputFromClient.close();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}
 				}
 			}
 			catch (IOException e) {
@@ -542,10 +554,9 @@ public class Server extends JFrame implements Runnable{
 		String response = server.processRequest("{type: a, low: 1970, high: 2020, condition: brain damage}");
 		System.out.println(response);
 		*/
-		
+		/*
 		String response = server.processRequest("{type: s, username: user2, pw: user2}");
 		System.out.println(response);	
-		/*
 		response = server.processRequest("{ type: c, fName: Paul, lName: Verhoeven, city: nyc, state: ohio, country: usa, phone: 555-555-5555, condition: diabetes, DOB: 1999-01-01 }");
 		System.out.println(response);
 		response = server.processRequest("{type: r, field: fName, val: Paul, op: eq}");
