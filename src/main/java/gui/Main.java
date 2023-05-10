@@ -169,6 +169,15 @@ public class Main extends JFrame implements ActionListener, Runnable{
 			String userID  = userIDField.getText();
 			String password = String.valueOf(userPasswordField.getPassword());
 			
+			//format and send userID and pw to server, for now just prints out received message
+			try {
+				toServer.writeUTF("{ type: l, username: " + userID + ", pw: " + password + " }");
+				String inMessage = fromServer.readUTF();
+				System.out.println("Client:" + inMessage);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
 			// If user name detected in database
 			if (userID.equals("a")) {
 				if(password.equals("a")) {
