@@ -53,7 +53,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 	JButton updatePatientButton = new JButton("Create Patient");
 	
 	JButton deletePatientPageButton = new JButton("Delete Patient Page");
-	JButton deletePatientButton = new JButton("Create Patient");
+	JButton deletePatientButton = new JButton("Delete Patient");
 	
 	// Patient Creation page setup
 	JLabel nameLabel = new JLabel("Name:");
@@ -120,7 +120,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		userIDLabel.setBounds(50, 100, 75, 25);
 		userPasswordLabel.setText("password:");
 		userPasswordLabel.setBounds(50, 150, 75, 25);
-		messageLabel.setBounds(125, 250, 250, 35);
+		messageLabel.setBounds(10, 250, 410, 35);
 		messageLabel.setFont(new Font(null, Font.ITALIC, 25));
 		
 		userIDField.setBounds(125, 100, 200, 25);
@@ -216,9 +216,11 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(phoneLabel);
 		frame.remove(phoneField);
 		frame.remove(createPatientButton);
+		frame.remove(deletePatientButton);
 		
 		// Configure message label
 		messageLabel.setText("Hello " + userIDField.getText());
+		messageLabel.setForeground(Color.blue);
 		
 		// Configure CRUD Buttons
 		createPatientPageButton.setBounds(120, 50, 170, 25);
@@ -383,18 +385,31 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(logoutButton);
 		
 		// Configure fields
+		queryPageButton.setBounds(270, 200, 100, 25);
+		queryPageButton.addActionListener(this);
+		
+		
+		nameLabel.setBounds(10, 10, 100, 25);
+		nameField.setBounds(50, 10, 100, 25);
+		
+		lastNameLabel.setBounds(10, 45, 100, 25);
+		lastNameField.setBounds(80, 45, 100, 25);
 		
 		// Configure message label
 		messageLabel.setForeground(Color.blue);
 		messageLabel.setText("Delete Patients");
 		
 		// Configure buttons
-		queryPageButton.setBounds(300, 300, 100, 25);
-		queryPageButton.addActionListener(this);
+		deletePatientButton.setBounds(10, 100, 150, 25);
+		deletePatientButton.addActionListener(this);
 		
 		// Add patient page components
 		frame.add(queryPageButton);
-		frame.add(createPatientButton);
+		frame.add(deletePatientButton);
+		frame.add(nameLabel);
+		frame.add(nameField);
+		frame.add(lastNameField);
+		frame.add(lastNameLabel);
 		
 		// Repaint
 		frame.repaint();
@@ -553,6 +568,37 @@ public class Main extends JFrame implements ActionListener, Runnable{
 			}
 		}
 		
+		// Deletes patient
+		if(e.getSource()==deletePatientButton) {
+			System.out.println("Client: Attempting patient deletion");
+			
+			// Collect new user credentials
+			String fname  = nameField.getText();
+			String lname = lastNameField.getText();
+			
+			// Could add an if else here to do input validation
+			// Send patient creation data to server
+			try {
+				toServer.writeUTF("{ type: d, fName: " + fname + ", lName: " + lname + " }");
+				String inMessage = fromServer.readUTF();
+				System.out.println("Client:" + inMessage);
+				
+				// User already exists
+				if (inMessage.equals("Deletion failed")) {
+					messageLabel.setForeground(Color.red);
+					messageLabel.setText("Patient does not exist");
+				}
+				// Creates new user
+				else {
+					System.out.println("Client: patient deleted - " + fname);
+					messageLabel.setForeground(Color.green);
+					messageLabel.setText("Patient deleted");
+					
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 		
 
 	}
