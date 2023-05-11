@@ -76,10 +76,12 @@ public class Server extends JFrame implements Runnable{
 		//initialize DB connection
 		FirestoreOptions firestoreOptions = null;
 		try {
+			serverLog.append("Connecting to Firestore..." + '\n');
 			firestoreOptions = FirestoreOptions.getDefaultInstance().toBuilder()
 			    .setProjectId(PROJECTID)
 			    .setCredentials(GoogleCredentials.getApplicationDefault())
 			    .build();
+			serverLog.append("Connected to Firestore... " + '\n');
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -145,6 +147,8 @@ public class Server extends JFrame implements Runnable{
 	}
 	
 	public String signup(String username, Object pw) {
+		serverLog.append("\nAttempting sign-up...");
+		System.out.println("Server: Attempting sign-up...");
 		String response = null;
 		//check if user already exists
 		ApiFuture<QuerySnapshot> query = null;
@@ -159,40 +163,46 @@ public class Server extends JFrame implements Runnable{
 			e.printStackTrace();
 		}
 		if(!document.isEmpty()) {
-			System.err.println("User already exists:");
+			serverLog.append("\nUser already exists...");
+			System.out.println("User already exists:");
+//			try {
+//				for (DocumentSnapshot doc : query.get().getDocuments()) {
+//					System.err.println(doc.getId());
+//				}
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			} catch (ExecutionException e) {
+//				e.printStackTrace();
+//			}
+			response =  "Username Exists";
+		}
+		else {
+			serverLog.append("\nCreating User:...");
+			String hashedPassword = BCrypt.hashpw((String)pw, BCrypt.gensalt());
+			DocumentReference docRef = db.collection("users").document(username);
+			Map<String, Object> userData = new HashMap<>();
+			userData.put("username", username);
+			userData.put("password", hashedPassword);
+			userData.put("admin", false);
+			ApiFuture<WriteResult> result = docRef.set(userData);
 			try {
-				for (DocumentSnapshot doc : query.get().getDocuments()) {
-					System.err.println(doc.getId());
-				}
+				System.out.println("Server: Update time : " + result.get().getUpdateTime());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-			return null;
+			
+			response = "{username: " + username + ", verified: true, " + "admin: false }";
+			serverLog.append("\nUser " + username + " created.");
+			
 		}
-		
-		
-		String hashedPassword = BCrypt.hashpw((String)pw, BCrypt.gensalt());
-		DocumentReference docRef = db.collection("users").document(username);
-		Map<String, Object> userData = new HashMap<>();
-		userData.put("username", username);
-		userData.put("password", hashedPassword);
-		userData.put("admin", false);
-		ApiFuture<WriteResult> result = docRef.set(userData);
-		try {
-			System.out.println("Update time : " + result.get().getUpdateTime());
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
-		
-		response = "{username: " + username + ", verified: true, " + "admin: false }";
+
 		return response;
 	}
 	
 	public String login(String username, Object pw) {
+		serverLog.append("\nAttempting Login...");
 		String response = null;
 		
 		ApiFuture<QuerySnapshot> query = null;
@@ -208,22 +218,26 @@ public class Server extends JFrame implements Runnable{
 			e.printStackTrace();
 		}
 		if(user.isEmpty()) {
+			serverLog.append("\nUser does not exit...");
 			return "{verified: false}";
 		}
 		
-		if(BCrypt.checkpw((String) pw, user.get(0).getString("password"))) {
+		if(BCrypt.checkpw((String) pw, user.get(0).getString("password"))) {			
+			serverLog.append("\nLogin successful...");
 			response = "{username: " + user.get(0).getString("username") + ", verified: true, " + "admin: " + user.get(0).getBoolean("admin") + " }";
 		}
 		else {
+			serverLog.append("\nIncorrect Password...");
 			response = "{verified: false}";
 		}
 		
-		//return admin
+		
 		return response;
 	}
 
-
 	public String create(Patient patient) {
+		serverLog.append("\nAttempting Patient Creation...");
+		
 		//check if patient record already exists
 		ApiFuture<QuerySnapshot> query = null;
 		CollectionReference patients = db.collection("patients");
@@ -236,8 +250,10 @@ public class Server extends JFrame implements Runnable{
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
+		// Patient Exists
 		if(!document.isEmpty()) {
-			System.err.println("Record already exists:");
+			serverLog.append("\nPatient already exists...");
+			System.out.println("Record already exists:");
 			try {
 				for (DocumentSnapshot doc : query.get().getDocuments()) {
 					System.err.println(doc.getId());
@@ -247,10 +263,11 @@ public class Server extends JFrame implements Runnable{
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-			return null;
+			return "Exists";
 		}
 		
 		//write new record to DB
+		serverLog.append("\nPatient created...");
 		String docName = patient.getfName() + "_" + patient.getlName();
 		ApiFuture<WriteResult> future = db.collection("patients").document(docName).set(patient.getPatientMap());
 		try {
@@ -260,7 +277,7 @@ public class Server extends JFrame implements Runnable{
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
-		return patient.toString();
+		return "Created";
 	}
 
 	public String create(JSONObject patient) {
@@ -277,7 +294,9 @@ public class Server extends JFrame implements Runnable{
 
 	public String create(String fName, String lName, String city, String state,
 					String country, String phone, String condition, String DOB) {
-
+		
+		phone = phone.substring(1);
+		
 		Patient patient = new Patient(fName, lName, city, state, country,
 					phone, DOB, condition);
 		return create(patient);
@@ -451,7 +470,6 @@ public class Server extends JFrame implements Runnable{
 		return response.toString();
 	}
 	
-
 	class HandleAClient implements Runnable{
 		private Socket socket; // Connected socket
 		private int clientNum;
@@ -485,11 +503,12 @@ public class Server extends JFrame implements Runnable{
 					try {
 					// Receive message from client
 					String inMessage = inputFromClient.readUTF();
-					System.out.println("Server received message: " + inMessage);
+					serverLog.append("\nMessage Received from Client: " + clientNum);
+					System.out.println("Server: Server received message: " + inMessage);
 					String response = processRequest(inMessage);
-					System.out.println(response);
+					System.out.println("Server: " + response);
 					outputToClient.writeUTF(response);
-					
+					serverLog.append("\nMessage sent to Client: " + clientNum + "\n");
 //					// Broadcast the message
 //					broadcastMessage(inMessage);
 //					messageBroadCast = new DataOutputStream(outputToClient);
@@ -518,9 +537,8 @@ public class Server extends JFrame implements Runnable{
 		try {
 			this.serverSocket = new ServerSocket(9898); // Create a server socket and attach it to port 9898
 			
-			// Log the server start time
-			serverLog.append("MedViz server started at " + new Date() + '\n');
-			System.out.println("Server started. Listening on port 9898.");
+			// Log the server start
+			serverLog.append("\nMedViz server started at " + new Date() +  '\n' + "Listening on port 9898." + '\n');
 			
 			// Listens for data from clients
 			while (true) {
@@ -528,7 +546,7 @@ public class Server extends JFrame implements Runnable{
 				listenerSocket = serverSocket.accept(); // Accept pending connections from clients
 				clientNumber++;// Increment client number
 				
-				serverLog.append("\nNew Connection!\nStarting thread for client connection" + clientNumber +" at " + new Date() + '\n');
+				serverLog.append("\nA new client has connected..." + '\n');
 				// Log client's host name and IP address
 				InetAddress inetAddress = listenerSocket.getInetAddress();
 				serverLog.append("Client host name: " + inetAddress.getHostName() + "\n");
