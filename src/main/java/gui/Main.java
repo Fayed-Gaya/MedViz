@@ -50,7 +50,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 	JButton vizButton = new JButton("Search");
 	
 	JButton updatePatientPageButton = new JButton("Update Patient Page");
-	JButton updatePatientButton = new JButton("Create Patient");
+	JButton updatePatientButton = new JButton("Update Patient");
 	
 	JButton deletePatientPageButton = new JButton("Delete Patient Page");
 	JButton deletePatientButton = new JButton("Delete Patient");
@@ -81,7 +81,12 @@ public class Main extends JFrame implements ActionListener, Runnable{
 	String[] conditions = {"prediabetes", "anemia", "sinusitis", "fracture", "cardiac arrest", "bronchitis", "sprain", "hypertension", "brain damage", "diabetes"};
 	JLabel conditionLabel = new JLabel("Condition:");
     JComboBox<String> conditionDropdown = new JComboBox<>(conditions);
-	
+    
+    JLabel fieldsLabel = new JLabel("Field:");
+    JLabel fieldsValueLabel = new JLabel("New Value:");
+    String[] fields = {"fName:", "lName", "country", "state", "city", "phone", "DOB", "condition"};
+    JComboBox<String> fieldsDropdown = new JComboBox<>(fields);
+    JTextField fieldsValueField = new JTextField();
 	
 	Main(){
 		super("Med Viz");
@@ -217,6 +222,12 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(phoneField);
 		frame.remove(createPatientButton);
 		frame.remove(deletePatientButton);
+		frame.remove(fieldsDropdown);
+		frame.remove(fieldsLabel);
+		frame.remove(fieldsValueField);
+		frame.remove(fieldsValueLabel);
+		frame.remove(updatePatientButton);
+		frame.remove(vizButton);
 		
 		// Configure message label
 		messageLabel.setText("Hello " + userIDField.getText());
@@ -340,9 +351,12 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		queryPageButton.setBounds(300, 300, 100, 25);
 		queryPageButton.addActionListener(this);
 		
+		vizButton.setBounds(10, 300, 100, 25);
+		vizButton.addActionListener(this);
+		
 		// Add patient page components
 		frame.add(queryPageButton);
-		frame.add(createPatientButton);
+		frame.add(vizButton);
 		
 		// Repaint
 		frame.repaint();
@@ -358,18 +372,44 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(logoutButton);
 		
 		// Configure fields
+		queryPageButton.setBounds(270, 200, 100, 25);
+		queryPageButton.addActionListener(this);
+		
+		nameLabel.setBounds(10, 10, 100, 25);
+		nameField.setBounds(50, 10, 100, 25);
+		
+		lastNameLabel.setBounds(10, 45, 100, 25);
+		lastNameField.setBounds(80, 45, 100, 25);
+		
+		fieldsLabel.setBounds(10, 90, 150, 25);
+		fieldsDropdown.setBounds(45, 90, 100, 25);
+		fieldsValueLabel.setBounds(145, 90, 100, 25);
+		fieldsValueField.setBounds(220, 90, 100, 25);
+		
 		
 		// Configure message label
 		messageLabel.setForeground(Color.blue);
 		messageLabel.setText("Update Patients");
 		
 		// Configure buttons
-		queryPageButton.setBounds(300, 300, 100, 25);
+		queryPageButton.setBounds(270, 200, 100, 25);
 		queryPageButton.addActionListener(this);
+		
+		updatePatientButton.setBounds(10, 155, 135, 25);
+		updatePatientButton.addActionListener(this);
 		
 		// Add patient page components
 		frame.add(queryPageButton);
 		frame.add(createPatientButton);
+		frame.add(nameLabel);
+		frame.add(nameField);
+		frame.add(lastNameField);
+		frame.add(lastNameLabel);
+		frame.add(fieldsLabel);
+		frame.add(fieldsDropdown);
+		frame.add(fieldsValueField);
+		frame.add(fieldsValueLabel);
+		frame.add(updatePatientButton);
 		
 		// Repaint
 		frame.repaint();
@@ -472,30 +512,36 @@ public class Main extends JFrame implements ActionListener, Runnable{
 			String userID  = userIDField.getText();
 			String password = String.valueOf(userPasswordField.getPassword());
 			
-			//format and send userID and pw to server, for now just prints out received message
-			try {
-				toServer.writeUTF("{ type: l, username: " + userID + ", pw: " + password + " }");
-				String inMessage = fromServer.readUTF();
-				System.out.println("Client:" + inMessage);
-				
-				JSONObject responseJSON = new JSONObject(inMessage);
-				
-				if (responseJSON.get("verified").toString().equals("true")) {
-					System.out.println("Login Successful");
+			if (userID.isEmpty() || password.isEmpty()) {
+				System.out.println("Client: Empty Credentials");
+				messageLabel.setForeground(Color.red);
+				messageLabel.setText("Enter User and Pass!");
+			} else {
+				//format and send userID and pw to server, for now just prints out received message
+				try {
+					toServer.writeUTF("{ type: l, username: " + userID + ", pw: " + password + " }");
+					String inMessage = fromServer.readUTF();
+					System.out.println("Client:" + inMessage);
 					
-					messageLabel.setForeground(Color.green);
-					messageLabel.setText("Client: Login successful");
-					paintQueryPage();
+					JSONObject responseJSON = new JSONObject(inMessage);
+					
+					if (responseJSON.get("verified").toString().equals("true")) {
+						System.out.println("Login Successful");
+						
+						messageLabel.setForeground(Color.green);
+						messageLabel.setText("Client: Login successful");
+						paintQueryPage();
+					}
+					else {
+						System.out.println("Client: Login Failed");
+						messageLabel.setForeground(Color.red);
+						messageLabel.setText("Login Failed");
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
-				else {
-					System.out.println("Client: Login Failed");
-					messageLabel.setForeground(Color.red);
-					messageLabel.setText("Login Failed");
-				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
 			
+			}
 		}
 		
 		// Signs up user
@@ -506,28 +552,34 @@ public class Main extends JFrame implements ActionListener, Runnable{
 			String newUserID  = userIDField.getText();
 			String newpassword = String.valueOf(userPasswordField.getPassword());
 			
-			// Send credentials to server
-			try {
-				toServer.writeUTF("{ type: s, username: " + newUserID + ", pw: " + newpassword + " }");
-				String inMessage = fromServer.readUTF();
-				System.out.println("Client:" + inMessage);
-				
-				// User already exists
-				if (inMessage.equals("Username Exists")) {
-					messageLabel.setForeground(Color.red);
-					messageLabel.setText("Username Taken");
-				}
-				// Creates new user
-				else {
-					System.out.println("Client: New user - " + newUserID + " created");
-					messageLabel.setForeground(Color.green);
-					messageLabel.setText("User Created");
+			if (newUserID.isEmpty() || newpassword.isEmpty()) {
+				System.out.println("Client: Empty Credentials");
+				messageLabel.setForeground(Color.red);
+				messageLabel.setText("Enter User and Pass!");
+			} else {	
+				// Send credentials to server
+				try {
+					toServer.writeUTF("{ type: s, username: " + newUserID + ", pw: " + newpassword + " }");
+					String inMessage = fromServer.readUTF();
+					System.out.println("Client:" + inMessage);
 					
+					// User already exists
+					if (inMessage.equals("Username Exists")) {
+						messageLabel.setForeground(Color.red);
+						messageLabel.setText("Username Taken");
+					}
+					// Creates new user
+					else {
+						System.out.println("Client: New user - " + newUserID + " created");
+						messageLabel.setForeground(Color.green);
+						messageLabel.setText("User Created");
+						
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
 				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
 		
+			}
 		}
 		
 		// Creates new patient
@@ -572,7 +624,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		if(e.getSource()==deletePatientButton) {
 			System.out.println("Client: Attempting patient deletion");
 			
-			// Collect new user credentials
+			// Collect user credentials
 			String fname  = nameField.getText();
 			String lname = lastNameField.getText();
 			
@@ -600,6 +652,44 @@ public class Main extends JFrame implements ActionListener, Runnable{
 			}
 		}
 		
+		// Updates patient
+		if(e.getSource()==updatePatientButton) {
+			System.out.println("Client: Attempting patient update");
+			
+			// Collect user credentials
+			String fname  = nameField.getText();
+			String lname = lastNameField.getText();
+			String field = fieldsDropdown.getSelectedItem().toString();
+			String val = fieldsValueField.getText();
+			
+			if (fname.isEmpty() || lname.isEmpty() || field.isEmpty() || val.isEmpty()) {
+				System.out.println("Client: Empty Values");
+				messageLabel.setForeground(Color.red);
+				messageLabel.setText("Enter all fields");
+			}
+			else {
+				try {
+					toServer.writeUTF("{ type: u, fName: " + fname + ", lName: " + lname + ", field: " + field + ", val: " + val + " }");
+					String inMessage = fromServer.readUTF();
+					System.out.println("Client:" + inMessage);
+					
+					// User does not exist
+					if (inMessage.equals("DNE")) {
+						messageLabel.setForeground(Color.red);
+						messageLabel.setText("Patient does not exist");
+					}
+					// Patient Updated
+					else {
+						messageLabel.setForeground(Color.green);
+						messageLabel.setText("Patient updated");
+						
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+		}
 
 	}
 	
