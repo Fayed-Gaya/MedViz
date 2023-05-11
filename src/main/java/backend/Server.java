@@ -364,6 +364,7 @@ public class Server extends JFrame implements Runnable{
 	}
 	
 	public String update(String fName, String lName, String field, String val) {
+		serverLog.append("\nAttempting patient update...");
 		//check if patient record exists
 		ApiFuture<QuerySnapshot> query = null;
 		CollectionReference patients = db.collection("patients");
@@ -377,8 +378,9 @@ public class Server extends JFrame implements Runnable{
 			e.printStackTrace();
 		}
 		if(document.isEmpty()) {
-			System.err.println("Record does not exist");
-			return null;
+			serverLog.append("\nPatient does not exist...");
+			System.out.println("Server: Record does not exist");
+			return "DNE";
 		}
 		
 		DocumentReference docRef = db.collection("patients").document(fName + "_" + lName);
@@ -391,7 +393,7 @@ public class Server extends JFrame implements Runnable{
 		} catch (ExecutionException e) {
 			e.printStackTrace();
 		}
-		
+		serverLog.append("\nPatient Updated...");
 		return fName + " " + lName + "'s " + field + " updated to " + val;
 	}
 	
