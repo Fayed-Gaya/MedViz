@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.io.IOException;
 import javax.swing.*;
 
+import org.json.JSONObject;
+
 
 public class Main extends JFrame implements ActionListener, Runnable{
 	
@@ -24,7 +26,6 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		
 		
 	// GUI setup
-		// Create main frame
 	JFrame frame = new JFrame();
 	
 	JButton loginButton = new JButton("Login");
@@ -37,6 +38,50 @@ public class Main extends JFrame implements ActionListener, Runnable{
 	JLabel userIDLabel = new JLabel();
 	JLabel userPasswordLabel = new JLabel();
 	JLabel messageLabel = new JLabel();
+	
+	// Query Page setup
+	JButton queryPageButton = new JButton("Main Page");
+	JButton logoutButton = new JButton("Logout");
+	
+	JButton createPatientPageButton = new JButton("Create Patient Page");
+	JButton createPatientButton = new JButton("Create Patient");
+	
+	JButton vizualizerPageButton = new JButton("MedViz Page");
+	JButton vizButton = new JButton("Search");
+	
+	JButton updatePatientPageButton = new JButton("Update Patient Page");
+	JButton updatePatientButton = new JButton("Create Patient");
+	
+	JButton deletePatientPageButton = new JButton("Delete Patient Page");
+	JButton deletePatientButton = new JButton("Create Patient");
+	
+	// Patient Creation page setup
+	JLabel nameLabel = new JLabel("Name:");
+	JTextField nameField = new JTextField();
+	
+	JLabel lastNameLabel = new JLabel("Last Name:");
+	JTextField lastNameField = new JTextField();
+	
+	String[] countries = {"USA", "Canada"};
+	JLabel countryLabel = new JLabel("Country:");
+    JComboBox<String> countryDropdown = new JComboBox<>(countries);
+    
+    JLabel stateLabel = new JLabel("State:");
+	JTextField stateField = new JTextField();
+	
+	JLabel cityLabel = new JLabel("City:");
+	JTextField cityField = new JTextField();
+	
+	JLabel phoneLabel = new JLabel("Phone:");
+	JTextField phoneField = new JTextField();
+	
+	JLabel DOBLabel = new JLabel("DOB (YYYY-MM-DD):");
+	JTextField DOBField = new JTextField();
+	
+	String[] conditions = {"prediabetes", "anemia", "sinusitis", "fracture", "cardiac arrest", "bronchitis", "sprain", "hypertension", "brain damage", "diabetes"};
+	JLabel conditionLabel = new JLabel("Condition:");
+    JComboBox<String> conditionDropdown = new JComboBox<>(conditions);
+	
 	
 	Main(){
 		super("Med Viz");
@@ -144,8 +189,225 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		
 	}
 	
+	private void paintQueryPage() {
+		// Remove login page components
+		frame.remove(loginButton);
+		frame.remove(signupPageButton);
+		frame.remove(resetButton);
+		frame.remove(userIDLabel);
+		frame.remove(userPasswordLabel);
+		frame.remove(userIDField);
+		frame.remove(userPasswordField);
+		frame.remove(queryPageButton);
+		frame.remove(nameLabel);
+		frame.remove(nameField);
+		frame.remove(lastNameLabel);
+		frame.remove(lastNameField);
+		frame.remove(countryLabel);
+		frame.remove(countryDropdown);
+		frame.remove(stateLabel);
+		frame.remove(stateField);
+		frame.remove(cityField);
+		frame.remove(cityLabel);
+		frame.remove(DOBField);
+		frame.remove(DOBLabel);
+		frame.remove(conditionDropdown);
+		frame.remove(conditionLabel);
+		frame.remove(phoneLabel);
+		frame.remove(phoneField);
+		frame.remove(createPatientButton);
+		
+		// Configure message label
+		messageLabel.setText("Hello " + userIDField.getText());
+		
+		// Configure CRUD Buttons
+		createPatientPageButton.setBounds(120, 50, 170, 25);
+		createPatientPageButton.addActionListener(this);
+		
+		vizualizerPageButton.setBounds(120, 100, 170, 25);
+		vizualizerPageButton.addActionListener(this);
+		
+		updatePatientPageButton.setBounds(120, 150, 170, 25);
+		updatePatientPageButton.addActionListener(this);
+		
+		deletePatientPageButton.setBounds(120, 200, 170, 25);
+		deletePatientPageButton.addActionListener(this);
+		
+		// Logout button
+		logoutButton.setBounds(5, 330, 100, 25);
+		logoutButton.addActionListener(this);
+		
+		// Add query page components
+		frame.add(createPatientPageButton);
+		frame.add(vizualizerPageButton);
+		frame.add(updatePatientPageButton);
+		frame.add(deletePatientPageButton);
+		frame.add(logoutButton);
+		
+		// Repaint
+		frame.repaint();
+		
+	}
+	
+	private void paintCreatePatientPage() {
+		// Remove query page components
+		frame.remove(createPatientPageButton);
+		frame.remove(vizualizerPageButton);
+		frame.remove(updatePatientPageButton);
+		frame.remove(deletePatientPageButton);
+		frame.remove(logoutButton);
+		
+		// Configure fields
+		// name, last name, city, state, country, phone, condition, DOB
+		nameLabel.setBounds(10, 10, 100, 25);
+		nameField.setBounds(50, 10, 100, 25);
+		
+		lastNameLabel.setBounds(10, 45, 100, 25);
+		lastNameField.setBounds(80, 45, 100, 25);
+		
+		countryLabel.setBounds(10, 75, 100, 25);
+		countryDropdown.setBounds(65, 75, 100, 25);
+		
+		stateLabel.setBounds(10, 105, 100, 25);
+		stateField.setBounds(65, 105, 100, 25);
+		
+		cityLabel.setBounds(10, 140, 100, 25);
+		cityField.setBounds(65, 140, 100, 25);
+		
+		phoneLabel.setBounds(190, 50, 100, 25);
+		phoneField.setBounds(285, 50, 100, 25);
+		
+		DOBLabel.setBounds(170, 10, 150, 25);
+		DOBField.setBounds(310, 10, 100, 25);
+		
+		conditionLabel.setBounds(190, 90, 100, 25);
+		conditionDropdown.setBounds(270, 90, 100, 25);
+		
+		
+		// Configure message label
+		messageLabel.setForeground(Color.blue);
+		messageLabel.setText("Patient Creation");
+		
+		// Configure buttons
+		queryPageButton.setBounds(270, 200, 100, 25);
+		queryPageButton.addActionListener(this);
+		
+		createPatientButton.setBounds(130, 200, 130, 25);
+		createPatientButton.addActionListener(this);
+		
+		// Add patient page components
+		frame.add(queryPageButton);
+		frame.add(createPatientButton);
+		frame.add(nameLabel);
+		frame.add(nameField);
+		frame.add(lastNameField);
+		frame.add(lastNameLabel);
+		frame.add(countryLabel);
+		frame.add(countryDropdown);
+		frame.add(cityLabel);
+		frame.add(stateLabel);
+		frame.add(stateField);
+		frame.add(cityField);
+		frame.add(phoneField);
+		frame.add(phoneLabel);
+		frame.add(DOBField);
+		frame.add(DOBLabel);
+		frame.add(conditionDropdown);
+		frame.add(conditionLabel);
+		
+		// Repaint
+		frame.repaint();
+		
+	}
+	
+	private void paintMedVizPage() {
+		// Remove query page components
+		frame.remove(createPatientPageButton);
+		frame.remove(vizualizerPageButton);
+		frame.remove(updatePatientPageButton);
+		frame.remove(deletePatientPageButton);
+		frame.remove(logoutButton);
+		
+		// Configure fields
+		
+		// Configure message label
+		messageLabel.setForeground(Color.blue);
+		messageLabel.setText("MedViz");
+		
+		// Configure buttons
+		queryPageButton.setBounds(300, 300, 100, 25);
+		queryPageButton.addActionListener(this);
+		
+		// Add patient page components
+		frame.add(queryPageButton);
+		frame.add(createPatientButton);
+		
+		// Repaint
+		frame.repaint();
+		
+	}
+	
+	private void paintUpdatePatientPage() {
+		// Remove query page components
+		frame.remove(createPatientPageButton);
+		frame.remove(vizualizerPageButton);
+		frame.remove(updatePatientPageButton);
+		frame.remove(deletePatientPageButton);
+		frame.remove(logoutButton);
+		
+		// Configure fields
+		
+		// Configure message label
+		messageLabel.setForeground(Color.blue);
+		messageLabel.setText("Update Patients");
+		
+		// Configure buttons
+		queryPageButton.setBounds(300, 300, 100, 25);
+		queryPageButton.addActionListener(this);
+		
+		// Add patient page components
+		frame.add(queryPageButton);
+		frame.add(createPatientButton);
+		
+		// Repaint
+		frame.repaint();
+		
+	}
+	
+	private void paintDeletePatientPage() {
+		// Remove query page components
+		frame.remove(createPatientPageButton);
+		frame.remove(vizualizerPageButton);
+		frame.remove(updatePatientPageButton);
+		frame.remove(deletePatientPageButton);
+		frame.remove(logoutButton);
+		
+		// Configure fields
+		
+		// Configure message label
+		messageLabel.setForeground(Color.blue);
+		messageLabel.setText("Delete Patients");
+		
+		// Configure buttons
+		queryPageButton.setBounds(300, 300, 100, 25);
+		queryPageButton.addActionListener(this);
+		
+		// Add patient page components
+		frame.add(queryPageButton);
+		frame.add(createPatientButton);
+		
+		// Repaint
+		frame.repaint();
+		
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {	
+		
+		// Paints sign-up page
+		if(e.getSource()==logoutButton) {
+			System.exit(0);
+		}
 		
 		// Resets text entry
 		if(e.getSource()==resetButton) {
@@ -163,8 +425,34 @@ public class Main extends JFrame implements ActionListener, Runnable{
 			paintLoginPage();
 		}
 		
+		// Paints login page
+		if(e.getSource()==queryPageButton) {
+			paintQueryPage();
+		}
+		
+		// Paints create patient page
+		if(e.getSource()==createPatientPageButton) {
+			paintCreatePatientPage();
+		}
+
+		// Paints MedViz page
+		if(e.getSource()==vizualizerPageButton) {
+			paintMedVizPage();
+		}
+
+		// Paints update patient page
+		if(e.getSource()==updatePatientPageButton) {
+			paintUpdatePatientPage();
+		}
+
+		// Paints delete page
+		if(e.getSource()==deletePatientPageButton) {
+			paintDeletePatientPage();
+		}
+		
 		// Logins in user
 		if(e.getSource()==loginButton) {
+			System.out.println("Client: Attempting login");
 			
 			String userID  = userIDField.getText();
 			String password = String.valueOf(userPasswordField.getPassword());
@@ -174,56 +462,100 @@ public class Main extends JFrame implements ActionListener, Runnable{
 				toServer.writeUTF("{ type: l, username: " + userID + ", pw: " + password + " }");
 				String inMessage = fromServer.readUTF();
 				System.out.println("Client:" + inMessage);
+				
+				JSONObject responseJSON = new JSONObject(inMessage);
+				
+				if (responseJSON.get("verified").toString().equals("true")) {
+					System.out.println("Login Successful");
+					
+					messageLabel.setForeground(Color.green);
+					messageLabel.setText("Client: Login successful");
+					paintQueryPage();
+				}
+				else {
+					System.out.println("Client: Login Failed");
+					messageLabel.setForeground(Color.red);
+					messageLabel.setText("Login Failed");
+				}
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 			
-			// If user name detected in database
-			if (userID.equals("a")) {
-				if(password.equals("a")) {
-					messageLabel.setForeground(Color.green);
-					messageLabel.setText("Login successful");
-					frame.dispose();
-					WelcomePage welcomePage = new WelcomePage(userID);
-					
-					
-				}
-				// Incorrect Password
-				else {
-					messageLabel.setForeground(Color.red);
-					messageLabel.setText("Wrong Password");
-				}
-			}
-			// User does not exist
-			else {
-				messageLabel.setForeground(Color.red);
-				messageLabel.setText("User does not exist");
-			}
 		}
 		
-		// 
+		// Signs up user
 		if(e.getSource()==signupButton) {
+			System.out.println("Client: Attempting sign-up");
 			
-			String userID  = userIDField.getText();
-			String password = String.valueOf(userPasswordField.getPassword());
+			// Collect new user credentials
+			String newUserID  = userIDField.getText();
+			String newpassword = String.valueOf(userPasswordField.getPassword());
 			
-			// Check to see if user exists
-			if (userID.equals("a")) {
-				messageLabel.setForeground(Color.red);
-				messageLabel.setText("User exists");
+			// Send credentials to server
+			try {
+				toServer.writeUTF("{ type: s, username: " + newUserID + ", pw: " + newpassword + " }");
+				String inMessage = fromServer.readUTF();
+				System.out.println("Client:" + inMessage);
+				
+				// User already exists
+				if (inMessage.equals("Username Exists")) {
+					messageLabel.setForeground(Color.red);
+					messageLabel.setText("Username Taken");
+				}
+				// Creates new user
+				else {
+					System.out.println("Client: New user - " + newUserID + " created");
+					messageLabel.setForeground(Color.green);
+					messageLabel.setText("User Created");
+					
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			}
-			else {
-				// Create User
-				messageLabel.setForeground(Color.green);
-				messageLabel.setText("User Created");
-			}
-			// If user does not exist create user
 		
 		}
 		
+		// Creates new patient
+		if(e.getSource()==createPatientButton) {
+			System.out.println("Client: Attempting patient Creation");
+			
+			// Collect new user credentials
+			String fname  = nameField.getText();
+			String lname = lastNameField.getText();
+			String country = countryDropdown.getSelectedItem().toString();
+			String city = cityField.getText();
+			String state = stateField.getText();
+			String phone = phoneField.getText();
+			String condition = conditionDropdown.getSelectedItem().toString();
+			String DOB = DOBField.getText();
+			
+			// Could add an if else here to do input validation
+			// Send patient creation data to server
+			try {
+				toServer.writeUTF("{ type: c, fName: " + fname + ", lName: " + lname + ", city: " + city + ", state: " + state + ", country: " + country + ", phone: " + "a" + phone + ", condition: " + condition + ", DOB: " + DOB + " }");
+				String inMessage = fromServer.readUTF();
+				System.out.println("Client:" + inMessage);
+				
+				// User already exists
+				if (inMessage.equals("Exists")) {
+					messageLabel.setForeground(Color.red);
+					messageLabel.setText("Patient Exists");
+				}
+				// Creates new user
+				else {
+					System.out.println("Client: Created Patient - " + fname);
+					messageLabel.setForeground(Color.green);
+					messageLabel.setText("Patient Created");
+					
+				}
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
 		
+		
+
 	}
-	
 	
 	class openConnection implements ActionListener {
 
@@ -247,7 +579,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		
 		try {
 			socket = new Socket("localhost", 9898);
-			System.out.println("Connected to server.");
+			System.out.println("Client: Connected to server.");
 			
 			// Create an output stream to write to the server
 			toServer = new DataOutputStream(socket.getOutputStream());
