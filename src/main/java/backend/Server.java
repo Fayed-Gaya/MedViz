@@ -396,6 +396,7 @@ public class Server extends JFrame implements Runnable{
 	}
 	
 	public String delete(String fName, String lName) {
+		serverLog.append("\nAttempting patient deletion...");
 		//check if patient record exists
 		ApiFuture<QuerySnapshot> query = null;
 		CollectionReference patients = db.collection("patients");
@@ -409,8 +410,9 @@ public class Server extends JFrame implements Runnable{
 			e.printStackTrace();
 		}
 		if(document.isEmpty()) {
-			System.err.println("Record does not exist");
-			return null;
+			serverLog.append("\nPatient does not exist...");
+			System.out.println("Server: Record does not exist");
+			return "Deletion failed";
 		}
 		
 		//if it does, delete it
@@ -424,7 +426,7 @@ public class Server extends JFrame implements Runnable{
 			e.printStackTrace();
 			return null;
 		}
-		
+		serverLog.append("\nPatient deleted");
 		return fName + " " + lName + " deleted";
 	}
 	
