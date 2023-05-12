@@ -169,6 +169,8 @@ MedViz uses Google's Firestore service. Google Firestore is a cloud-based NoSQL 
 - input validation
 - Data visualization
 
+  ![agg](images/agg.png)
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -186,3 +188,4 @@ MedViz can be set up on your system by....
 [update]: images/updatePatient.png
 [search]: images/medViz.png
 [main]: images/main.png
+[agg]: images/agg.png
