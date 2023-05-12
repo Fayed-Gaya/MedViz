@@ -32,13 +32,24 @@
     <li>
       <a href="#concepts-covered">Concepts Covered</a>
       <ul>
-        <li><a href="#gui">Graphical User Interface</a></li>
+        <li><a href="#GUI">Graphical User Interface</a></li>
         <li><a href="#networking">Networking</a></li>
         <li><a href="#concurrency">Concurrency</a></li>
-        <li><a href="#database">Databases</a></li>
+        <li><a href="#database-support">Databases</a></li>
       </ul>
     </li>
-    <li><a href="#feature-list">Feature List</a></li>
+    <li><a href="#feature-list">Feature List</a>
+        <ul>
+            <li><a href="#login">Login</a></li>
+            <li><a href="#sign-up">Sign-Up</a></li>
+            <li><a href="#patient-creation">Patient Creation</a></li>
+            <li><a href="#value-lookup-search">Value Lookup Search</a></li>
+            <li><a href="#patient-update">Patient Update</a></li>
+            <li><a href="#patient-deletion">Patient Deletion</a></li>
+            <li><a href="#aggregate-value-search">Aggregate Value Search</a></li>
+        </ul>
+    </li>
+    <li><a href="#feature-list">Project Setup</a></li>
   </ol>
 </details>
 
@@ -71,35 +82,52 @@ Data is drawn from Synthea. A project released by best-in-class Not-for-profit M
 <!-- Concepts Covered -->
 ## Concepts Covered
 
-### gui
-gui
-
-### networking
-nw
-
-### concurrency
-cc
-
-### database
-db
-
-<!-- Feature List -->
-### Feature List
-
-1. GUI
+### GUI
+GUI
     - Landing Page
     - Sign-in Page
     - Sin-up page
     - Query Entry Page
         - Data Visualization Frame
-2. Client
+
+### Networking
+Client
     - Creates a session to send and receive query data to and from server
-3. Server
-    - Can handle multiple client connections
-4. Database
+Server
+    - Can handle multiple client connection
+
+### Concurrency
+Multi threaded, locked at db and within server for special operations
+
+### Database Support
+Database
     - Store user information
     - Store data
     - NoSQL Database:GCP Firestore
+
+<!-- Feature List -->
+## Feature List
+
+### Login
+login, login validation, messaging
+
+### Sign Up
+signup, signup validation, messaging
+
+### Patient Creation
+create patient, input validation
+
+### Value Lookup Search
+Lookup and visualize data based on field
+
+### Patient Update
+Update patient records
+
+### Patient Deletion
+Delete patient records
+
+### Aggregate Value Search
+Search and visuzalize aggreate patient condition datas
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
