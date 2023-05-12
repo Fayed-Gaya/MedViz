@@ -88,37 +88,37 @@ The different frame paints include:
   
   ![login](images/login.png)
 
-  1. Login Page
+  1. Login Page:
   The page where the user logs in. Only verified users are a logged in and Admin accounts are given special priveledge. Additionally, the user is given a message that details whether entered information is missing, a username does not exist, or a password is incorrect. Navigation to the sign up page and a credential reset button is available.
   
   
   ![signup](images/signUp.png)
 
-  2. Sign-Up Page
+  2. Sign-Up Page:
   The page where a use can sign up. Checks are run on whether credentials are left empty and if a username is taken. The user is correspondingly notified. Once a user is signed up they can navigate to the login page and login using their credentials.
   
   
   ![main](images/mainPage.png)
 
-  3. Main Page
+  3. Main Page:
   The main page functions as a way to naviage to the different parts of MedViz including the create, update, and delete patient information pages and the MedViz vizualization page. All of those pages contain a link to navigate back to the main page. Users can also logout from the main page which closes the client application.
 
   
   ![create](images/patientCreation.png)
 
-  4. Create Patient Page
+  4. Create Patient Page:
   The create patient page allows users to enter patient information in order to create a new patient record in the database. Input validation is conducted at the client level. Additionally, if users try to create a patient that already exists, they are notified of this error.
 
   
   ![medViz](images/medViz.png)
 
-  5. MedViz Page
+  5. MedViz Page:
   The MedViz Page allows for two different types of data visualization. The first is a visuzalization based on looking up a particular value with choices for the types of conditions applied to that value, including equals to, less than, less than or equals to, greater than, greater than or equals to, and not equals to. The second visualization allows users to search up frequency of a given condition, selected from a drop down menu, betweeen a range of years. This is the marquee feature of MedViz.
 
   
   ![update](images/updatePatient.png)
 
-  6. Update Patient Page
+  6. Update Patient Page:
   The Update patient page allow users to update any value within a patient record. Standard input validation and patient existence checking is applied.
 
   
@@ -129,19 +129,13 @@ The different frame paints include:
 
 
 ### Networking
-Client
-    - Creates a session to send and receive query data to and from server
-Server
-    - Can handle multiple client connection
+Networking is implemented using the traditional client-server architecture. A MedViz client runs as a standalone program which connects over a netowork to a MedViz server. This enables multiple clients to connect to the same server. Servers handle clients by receiving the connection in a dedicated thread. This allows for the server to communicate with clients individually and isolate information exchange. 
 
 ### Concurrency
-Multi threaded, locked at db and within server for special operations
+Concurrency in MedViz is implemented at two levels. The first is at the database source. Firestore has been configured such that no records can be read or written to at the same time making it threadsafe. On the second level, locks have been used within the server program so that no two clients trigger race conditions when communicating with the database through the server.
 
 ### Database Support
-Database
-    - Store user information
-    - Store data
-    - NoSQL Database:GCP Firestore
+MedViz uses Google's Firestore service. Google Firestore is a cloud-based NoSQL document database that enables MedViz to store, sync, and query data from within the Java application. It was chosen due to ease of configuration scalability, allowing us to load the database with several thousand patient records, leading to a meaningful prototype. Firestore empowes MedViz's user authentication system, patient record interaction, and general data storage.
 
 <!-- Feature List -->
 ## Feature List
