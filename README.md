@@ -98,13 +98,13 @@ The different frame paints include:
   The page where a use can sign up. Checks are run on whether credentials are left empty and if a username is taken. The user is correspondingly notified. Once a user is signed up they can navigate to the login page and login using their credentials.
   
   
-  ![main](images/main.png)
+  ![main](images/mainPage.png)
 
   3. Main Page
   The main page functions as a way to naviage to the different parts of MedViz including the create, update, and delete patient information pages and the MedViz vizualization page. All of those pages contain a link to navigate back to the main page. Users can also logout from the main page which closes the client application.
 
   
-  ![create](images/patientCreate.png)
+  ![create](images/patientCreation.png)
 
   4. Create Patient Page
   The create patient page allows users to enter patient information in order to create a new patient record in the database. Input validation is conducted at the client level. Additionally, if users try to create a patient that already exists, they are notified of this error.
