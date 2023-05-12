@@ -84,9 +84,29 @@ public class Main extends JFrame implements ActionListener, Runnable{
     
     JLabel fieldsLabel = new JLabel("Field:");
     JLabel fieldsValueLabel = new JLabel("New Value:");
-    String[] fields = {"fName:", "lName", "country", "state", "city", "phone", "DOB", "condition"};
+    String[] fields = {"fName", "lName", "country", "state", "city", "phone", "DOB", "condition"};
     JComboBox<String> fieldsDropdown = new JComboBox<>(fields);
     JTextField fieldsValueField = new JTextField();
+    
+    // MedViz Page Setup
+    JLabel lookupLabel = new JLabel("Lookup Field:");
+    JLabel valueLabel = new JLabel("Value:");
+    JLabel searchConditionLabel = new JLabel("Search Condition:");
+    
+    JTextField valueField = new JTextField();
+    String[] searchConditions = {"eq", "lt", "leq", "gt", "geq", "ne"};
+    JComboBox<String> searchConditionDropdown = new JComboBox<>(searchConditions);
+    
+    
+    JLabel startYearLabel = new JLabel("Start Year:");
+    JLabel endYearLabel = new JLabel("End Year:");
+    
+    JTextField startYearField = new JTextField();
+    JTextField endYearField = new JTextField();
+    
+    
+    JButton vizButton2 = new JButton("Aggregate Search");
+    
 	
 	Main(){
 		super("Med Viz");
@@ -195,6 +215,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 	}
 	
 	private void paintQueryPage() {
+		frame.setSize(420, 420);
 		// Remove login page components
 		frame.remove(loginButton);
 		frame.remove(signupPageButton);
@@ -228,6 +249,19 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(fieldsValueLabel);
 		frame.remove(updatePatientButton);
 		frame.remove(vizButton);
+		frame.remove(lookupLabel);
+		frame.remove(fieldsDropdown);
+		frame.remove(valueLabel);
+		frame.remove(valueField);
+		frame.remove(searchConditionLabel);
+		frame.remove(searchConditionDropdown);
+		frame.remove(startYearLabel);
+		frame.remove(startYearField);
+		frame.remove(endYearLabel);
+		frame.remove(endYearField);
+		frame.remove(conditionLabel);
+		frame.remove(conditionDropdown);
+		frame.remove(vizButton2);
 		
 		// Configure message label
 		messageLabel.setText("Hello " + userIDField.getText());
@@ -334,6 +368,8 @@ public class Main extends JFrame implements ActionListener, Runnable{
 	}
 	
 	private void paintMedVizPage() {
+		frame.setSize(575, 420);
+		
 		// Remove query page components
 		frame.remove(createPatientPageButton);
 		frame.remove(vizualizerPageButton);
@@ -342,6 +378,23 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(logoutButton);
 		
 		// Configure fields
+		lookupLabel.setBounds(5, 5, 100, 25);
+		fieldsDropdown.setBounds(90, 5, 100, 25);
+		
+		valueLabel.setBounds(200, 5, 100, 25);
+		valueField.setBounds(240, 5, 80, 25);
+		
+		searchConditionLabel.setBounds(325, 5, 120, 25);
+		searchConditionDropdown.setBounds(445, 5, 100, 25);
+		
+		startYearLabel.setBounds(5, 100, 100, 25);
+		startYearField.setBounds(70, 100, 100, 25);
+		
+		endYearLabel.setBounds(170, 100, 100, 25);
+		endYearField.setBounds(230, 100, 100, 25);
+		
+		conditionLabel.setBounds(340, 100, 100, 25);
+		conditionDropdown.setBounds(405, 100, 150, 25);
 		
 		// Configure message label
 		messageLabel.setForeground(Color.blue);
@@ -351,12 +404,29 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		queryPageButton.setBounds(300, 300, 100, 25);
 		queryPageButton.addActionListener(this);
 		
-		vizButton.setBounds(10, 300, 100, 25);
+		vizButton.setBounds(225, 57, 100, 25);
 		vizButton.addActionListener(this);
+		
+		vizButton2.setBounds(213, 140, 160, 25);
+		vizButton2.addActionListener(this);
 		
 		// Add patient page components
 		frame.add(queryPageButton);
 		frame.add(vizButton);
+		frame.add(lookupLabel);
+		frame.add(fieldsDropdown);
+		frame.add(valueLabel);
+		frame.add(valueField);
+		frame.add(searchConditionLabel);
+		frame.add(searchConditionDropdown);
+		frame.add(startYearLabel);
+		frame.add(startYearField);
+		frame.add(endYearLabel);
+		frame.add(endYearField);
+		frame.add(conditionLabel);
+		frame.add(conditionDropdown);
+		frame.add(vizButton2);
+		
 		
 		// Repaint
 		frame.repaint();
@@ -689,6 +759,79 @@ public class Main extends JFrame implements ActionListener, Runnable{
 				}
 				
 			}
+		}
+		
+		// Execute read
+		if(e.getSource()==vizButton) {
+			
+			String field = fieldsDropdown.getSelectedItem().toString();
+			String value = valueField.getText();
+			String searchCon = searchConditionDropdown.getSelectedItem().toString();
+			
+			if (field.isEmpty() || value.isEmpty() || searchCon.isEmpty()) {
+				System.out.println("Client: viz1 Empty values entered.");
+				messageLabel.setForeground(Color.red);
+				messageLabel.setText("Enter all fields for search");
+			}
+			else {
+				try {
+					toServer.writeUTF("{ type: r, field: " + field + ", val: " + value + ", op: " + searchCon + " }");
+					String inMessage = fromServer.readUTF();
+					
+					// No records or incorrect entry
+					if (inMessage.equals("[]") || inMessage.equals(" []")) {
+						messageLabel.setForeground(Color.red);
+						messageLabel.setText("No Results");
+					}
+					// Patient Updated
+					else {
+						System.out.println("Client: " + inMessage);
+						messageLabel.setForeground(Color.green);
+						messageLabel.setText("Results found");
+						
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
+		}
+		
+		// Execute aggregate
+		if(e.getSource()==vizButton2) {
+			
+			String startYear = startYearField.getText();
+			String endYear = endYearField.getText();
+			String con = conditionDropdown.getSelectedItem().toString();
+
+			
+			if (startYear.isEmpty() || endYear.isEmpty() || con.isEmpty()) {
+				System.out.println("Client: viz2 Empty values entered.");
+				messageLabel.setForeground(Color.red);
+				messageLabel.setText("Enter all fields for aggregate search");
+			}
+			else {
+				try {
+					toServer.writeUTF("{ type: a, low: " + startYear + ", high: " + endYear + ", condition: " + con + " }");
+					String inMessage = fromServer.readUTF();
+					
+					// No records or incorrect entry
+					if (inMessage.equals("[]") || inMessage.equals(" []")) {
+						messageLabel.setForeground(Color.red);
+						messageLabel.setText("No Results");
+					}
+					// Patient Updated
+					else {
+						System.out.println("Client: " + inMessage);
+						messageLabel.setForeground(Color.green);
+						messageLabel.setText("Results found");
+						
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			
 		}
 
 	}
