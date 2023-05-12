@@ -124,7 +124,7 @@ The different frame paints include:
   
   ![delete](images/deletePatient.png)
 
-  7. Delete Patient Page
+  7. Delete Patient Page:
   Admin privledged users can delete patient records from the database.
 
 
@@ -136,33 +136,49 @@ Concurrency in MedViz is implemented at two levels. The first is at the database
 
 ### Database Support
 MedViz uses Google's Firestore service. Google Firestore is a cloud-based NoSQL document database that enables MedViz to store, sync, and query data from within the Java application. It was chosen due to ease of configuration scalability, allowing us to load the database with several thousand patient records, leading to a meaningful prototype. Firestore empowes MedViz's user authentication system, patient record interaction, and general data storage.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- Feature List -->
 ## Feature List
 
 ### Login
-login, login validation, messaging
+- User login and authentication
+- Responsive user messaging
 
 ### Sign Up
-signup, signup validation, messaging
+- Account creation
+- Account creation validation
+- Responsive user messaging
 
 ### Patient Creation
-create patient, input validation
+- New patient record creation
+- Input validation
 
 ### Value Lookup Search
-Lookup and visualize data based on field
+- Field value look up
+- 7 different look up conditions supported
+- result visualization
 
 ### Patient Update
-Update patient records
+- Patient record updating
+- Input Validation
+- Responsive messaging
 
 ### Patient Deletion
-Delete patient records
+- Patient Deletion
+- Seperation between admin and average user priveledges
 
 ### Aggregate Value Search
-Search and visuzalize aggreate patient condition datas
+- Search for condition data bounded by year
+- input validation
+- Data visualization
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+
+## Project Setup
+MedViz can be set up on your system by....
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 <!-- MARKDOWN LINKS & IMAGES -->
 [product-screenshot]: images/loginTemp.png
 [login]: images/login.png
