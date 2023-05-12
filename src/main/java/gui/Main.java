@@ -9,6 +9,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 import java.io.IOException;
 import javax.swing.*;
@@ -17,6 +19,15 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.plot.PlotOrientation;
 
 
 public class Main extends JFrame implements ActionListener, Runnable{
@@ -123,6 +134,9 @@ public class Main extends JFrame implements ActionListener, Runnable{
     private JTable resTable;
     Vector<String> myVector = new Vector<String>();
     JScrollPane scrollPane =  new JScrollPane(resTable);
+    
+    // aggregate search setup
+    ChartPanel chartPanel = new ChartPanel(null);
     
 	
 	Main(){
@@ -291,6 +305,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(resTable);
 		frame.remove(queryPageButton);
 		frame.remove(scrollPane);
+		frame.remove(chartPanel);
 		
 		// Configure message label
 		messageLabel.setText("Hello " + userIDField.getText());
@@ -507,7 +522,44 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		// Repaint
 		frame.repaint();
 	}
+	
+	private void paintAggregateSearchResults() {
+		frame.setLayout(new BorderLayout());
+		frame.setSize(800, 800);
+		// remove medViz Components
+		frame.remove(queryPageButton);
+		frame.remove(vizButton);
+		frame.remove(lookupLabel);
+		frame.remove(fieldsDropdown2);
+		frame.remove(valueLabel);
+		frame.remove(valueField);
+		frame.remove(searchConditionLabel);
+		frame.remove(searchConditionDropdown);
+		frame.remove(startYearLabel);
+		frame.remove(startYearField);
+		frame.remove(endYearLabel);
+		frame.remove(endYearField);
+		frame.remove(conditionLabel);
+		frame.remove(conditionDropdown);
+		frame.remove(vizButton2);
+		frame.remove(messageLabel);
 
+
+	    
+		// Configure buttons
+		queryPageButton.setBounds(400, 730, 100, 25);
+		queryPageButton.addActionListener(this);
+		
+	    // Add new components
+		frame.add(chartPanel, BorderLayout.CENTER);
+		frame.add(queryPageButton, BorderLayout.SOUTH);
+	    
+		// Repaint
+		frame.repaint();
+		
+		
+	}
+	
 	public void populateTable(String jsonArrayString) throws JSONException {
 		    // Clear the existing data in the table
 		    DefaultTableModel model = (DefaultTableModel)resTable.getModel();
@@ -531,6 +583,60 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		    }
 		  }
 
+	public void createBarGraph(String data, String title) {
+	    // Parse the key-value pairs from the string into a TreeMap
+	    TreeMap<Integer, Integer> map = new TreeMap<Integer, Integer>();
+	    String[] pairs = data.split(",");
+	    for (String pair : pairs) {
+	        String[] parts = pair.split(":");
+	        int year = Integer.parseInt(parts[0].trim());
+	        int count = Integer.parseInt(parts[1].trim());
+	        map.put(year, count);
+	    }
+
+	    // Create a dataset from the TreeMap
+	    DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+	    for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+	        dataset.addValue(entry.getValue(), "Count", entry.getKey());
+	    }
+
+	    // Create the chart
+	    JFreeChart chart = ChartFactory.createBarChart(title, "Year", "Count",
+	            dataset, PlotOrientation.VERTICAL, false, true, false);
+
+	    // Set the chart background color
+	    chart.setBackgroundPaint(Color.WHITE);
+
+	    // Get the plot of the chart
+	    CategoryPlot plot = chart.getCategoryPlot();
+
+	    // Set the background color of the plot
+	    plot.setBackgroundPaint(Color.WHITE);
+
+	    // Set the range axis label font
+	    NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+	    rangeAxis.setLabelFont(rangeAxis.getLabelFont().deriveFont(16f));
+
+	    // Set the domain axis label font
+	    CategoryAxis domainAxis = plot.getDomainAxis();
+	    domainAxis.setLabelFont(domainAxis.getLabelFont().deriveFont(16f));
+
+	    // Set the bar renderer
+	    BarRenderer renderer = (BarRenderer) plot.getRenderer();
+	    renderer.setDrawBarOutline(false);
+	    renderer.setBaseItemLabelGenerator(null);
+	    renderer.setBaseItemLabelsVisible(true);
+
+	    // Create a new frame to display the chart
+	    JFrame frame = new JFrame(title);
+	    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+	    // Create a chart panel and add it to the frame
+	    chartPanel = new ChartPanel(chart);
+	    chartPanel.setPreferredSize(new java.awt.Dimension(1000, 500));
+	    
+	}
+	
 	private void paintUpdatePatientPage() {
 		// Remove query page components
 		frame.remove(createPatientPageButton);
@@ -584,6 +690,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		
 	}
 	
+	
 	private void paintDeletePatientPage() {
 		// Remove query page components
 		frame.remove(createPatientPageButton);
@@ -623,6 +730,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.repaint();
 		
 	}
+	
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {	
@@ -930,6 +1038,12 @@ public class Main extends JFrame implements ActionListener, Runnable{
 						System.out.println("Client: " + inMessage);
 						messageLabel.setForeground(Color.green);
 						messageLabel.setText("Results found");
+						
+						String graphString = inMessage.substring(2);
+						graphString = graphString.substring(0, graphString.length() - 3);
+						
+						createBarGraph(graphString, con);
+						paintAggregateSearchResults();
 						
 					}
 				} catch (IOException e1) {
