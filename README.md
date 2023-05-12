@@ -30,7 +30,14 @@
       </ul>
     </li>
     <li>
-      <a href="#concepts-covered">Concepts Covered</a></li>
+      <a href="#concepts-covered">Concepts Covered</a>
+      <ul>
+        <li><a href="#gui">Graphical User Interface</a></li>
+        <li><a href="#networking">Networking</a></li>
+        <li><a href="#concurrency">Concurrency</a></li>
+        <li><a href="#database">Databases</a></li>
+      </ul>
+    </li>
     <li><a href="#feature-list">Feature List</a></li>
   </ol>
 </details>
@@ -64,11 +71,17 @@ Data is drawn from Synthea. A project released by best-in-class Not-for-profit M
 <!-- Concepts Covered -->
 ## Concepts Covered
 
-Advanced Java Concepts:
-1. Databases, NOSQL
-2. Concurrency, Multi-client support
-3. Networking
-4. GUI and Data Visualization
+### gui
+gui
+
+### networking
+nw
+
+### concurrency
+cc
+
+### database
+db
 
 <!-- Feature List -->
 ### Feature List
