@@ -175,7 +175,30 @@ MedViz uses Google's Firestore service. Google Firestore is a cloud-based NoSQL 
 
 
 ## Project Setup
-MedViz can be set up on your system by....
+MedViz can be set up on your system by first installing Maven on your system. If you have a Mac with homebrew installed, simply type the command "brew install maven" into your terminal, otherwise follow these instructions: https://maven.apache.org/download.cgi
+
+To obtain permissions for our database, you must first install Google's CLI: https://cloud.google.com/sdk/docs/install
+
+Once Google CLI is installed, run "./google-cloud-sdk/install.sh" from the folder in which it was installed, and be sure to allow the CLI to modify your PATH variable so that it can automatically set your permissions. Note that this may take a few minutes.
+
+
+run "./google-cloud-sdk/bin/gcloud init", sign in as either your NYU email if you are a TA, or as your provided gmail address if you are the professor. Choose MedViz as your default project
+
+You can then enter the command "gcloud auth application-default login" and sign in to your email to set your default Google credentials and have read/write access to our DB. After this, you should be able to simply run the Server file under src/java/main/Backend in Eclipse, and connect as a client with Main under src/java/main/GUI in Eclipse.
+
+User access:
+
+UserID = user
+
+Password = user
+
+Admin access:
+
+UserID = admin
+
+Password = admin
+
+You will also have access to the Firebase console by logging in here: https://firebase.google.com/, choosing "MedViz" and clicking "go to console" on the top right of the page. Click "Firestore Database" on the leftside menu to explore the database
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
