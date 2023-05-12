@@ -674,7 +674,6 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		
 		// Add patient page components
 		frame.add(queryPageButton);
-		frame.add(createPatientButton);
 		frame.add(nameLabel);
 		frame.add(nameField);
 		frame.add(lastNameField);

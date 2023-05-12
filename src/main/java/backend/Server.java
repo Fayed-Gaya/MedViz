@@ -165,15 +165,6 @@ public class Server extends JFrame implements Runnable{
 		if(!document.isEmpty()) {
 			serverLog.append("\nUser already exists...");
 			System.out.println("User already exists:");
-//			try {
-//				for (DocumentSnapshot doc : query.get().getDocuments()) {
-//					System.err.println(doc.getId());
-//				}
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			} catch (ExecutionException e) {
-//				e.printStackTrace();
-//			}
 			response =  "Username Exists";
 		}
 		else {
@@ -518,17 +509,11 @@ public class Server extends JFrame implements Runnable{
 					// Receive message from client
 					String inMessage = inputFromClient.readUTF();
 					serverLog.append("\nMessage Received from Client: " + clientNum);
-					System.out.println("Server: Server received message: " + inMessage);
+					//System.out.println("Server: Server received message: " + inMessage);
 					String response = processRequest(inMessage);
-					System.out.println("Server: " + response);
+					//System.out.println("Server: " + response);
 					outputToClient.writeUTF(response);
 					serverLog.append("\nMessage sent to Client: " + clientNum + "\n");
-//					// Broadcast the message
-//					broadcastMessage(inMessage);
-//					messageBroadCast = new DataOutputStream(outputToClient);
-//					messageBroadCast.writeUTF(inMessage);
-					
-//					outputToClient.writeUTF(inMessage);
 					}
 					catch(IOException e) {
 						try {
