@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -7,9 +8,14 @@ import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.Vector;
 import java.io.IOException;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -107,6 +113,11 @@ public class Main extends JFrame implements ActionListener, Runnable{
     
     JButton vizButton2 = new JButton("Aggregate Search");
     
+    // Visualization page setup
+    private JTable resTable;
+    Vector<String> myVector = new Vector<String>();
+    JScrollPane scrollPane =  new JScrollPane(resTable);
+    
 	
 	Main(){
 		super("Med Viz");
@@ -124,6 +135,13 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		menu.add(exitItem);
 		menuBar.add(menu); // Add File menu to menu bar
 		frame.setJMenuBar(menuBar);
+		
+		// Build results table
+		String[] columnNames = {"First Name", "Last Name", "City", "State", "Country", "Phone", "Condition", "DOB"};
+		myVector.addAll(Arrays.asList(columnNames));
+		
+		DefaultTableModel model = new DefaultTableModel(myVector, 0);
+	    resTable = new JTable(model);
 		
 		// Initialize Login Page
 		paintLoginPage();
@@ -216,6 +234,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 	
 	private void paintQueryPage() {
 		frame.setSize(420, 420);
+		frame.setLayout(null);
 		// Remove login page components
 		frame.remove(loginButton);
 		frame.remove(signupPageButton);
@@ -262,6 +281,9 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(conditionLabel);
 		frame.remove(conditionDropdown);
 		frame.remove(vizButton2);
+		frame.remove(resTable);
+		frame.remove(queryPageButton);
+		frame.remove(scrollPane);
 		
 		// Configure message label
 		messageLabel.setText("Hello " + userIDField.getText());
@@ -426,6 +448,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.add(conditionLabel);
 		frame.add(conditionDropdown);
 		frame.add(vizButton2);
+		frame.add(messageLabel);
 		
 		
 		// Repaint
@@ -433,6 +456,69 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		
 	}
 	
+	private void paintSearchResults() {
+		frame.setLayout(new BorderLayout());
+		
+		frame.setSize(800, 800);
+		// remove medViz Components
+		frame.remove(queryPageButton);
+		frame.remove(vizButton);
+		frame.remove(lookupLabel);
+		frame.remove(fieldsDropdown);
+		frame.remove(valueLabel);
+		frame.remove(valueField);
+		frame.remove(searchConditionLabel);
+		frame.remove(searchConditionDropdown);
+		frame.remove(startYearLabel);
+		frame.remove(startYearField);
+		frame.remove(endYearLabel);
+		frame.remove(endYearField);
+		frame.remove(conditionLabel);
+		frame.remove(conditionDropdown);
+		frame.remove(vizButton2);
+		frame.remove(messageLabel);
+	    
+		// Configure resTabel
+		resTable.setBounds(0, 0, 800, 725);
+		
+	    // Create the scroll pane and add the table to it
+		scrollPane = new JScrollPane(resTable);
+	    
+		// Configure buttons
+		queryPageButton.setBounds(400, 730, 100, 25);
+		queryPageButton.addActionListener(this);
+		
+	    // Add new components
+		frame.add(queryPageButton, BorderLayout.SOUTH);
+		frame.add(scrollPane, BorderLayout.CENTER);
+	    
+		// Repaint
+		frame.repaint();
+	}
+
+	public void populateTable(String jsonArrayString) throws JSONException {
+		    // Clear the existing data in the table
+		    DefaultTableModel model = (DefaultTableModel)resTable.getModel();
+		    model.setRowCount(0);
+
+		    // Parse the JSON array string and add the rows to the table
+		    JSONArray jsonArray = new JSONArray(jsonArrayString);
+		    for (int i = 0; i < jsonArray.length(); i++) {
+		      JSONObject jsonObject = jsonArray.getJSONObject(i);
+		      String[] row = {
+		        jsonObject.getString("fName"),
+		        jsonObject.getString("lName"),
+		        jsonObject.getString("city"),
+		        jsonObject.getString("state"),
+		        jsonObject.getString("country"),
+		        jsonObject.getString("phone"),
+		        jsonObject.getString("condition"),
+		        jsonObject.get("DOB").toString()
+		      };
+		      model.addRow(row);
+		    }
+		  }
+
 	private void paintUpdatePatientPage() {
 		// Remove query page components
 		frame.remove(createPatientPageButton);
@@ -789,6 +875,10 @@ public class Main extends JFrame implements ActionListener, Runnable{
 						messageLabel.setForeground(Color.green);
 						messageLabel.setText("Results found");
 						
+						populateTable(inMessage);
+						paintSearchResults();
+						
+						
 					}
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -879,6 +969,5 @@ public class Main extends JFrame implements ActionListener, Runnable{
 
 	public static void main(String[] args) {
 		Main gui = new Main();
-		
 	}
 } 
