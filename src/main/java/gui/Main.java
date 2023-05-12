@@ -99,6 +99,9 @@ public class Main extends JFrame implements ActionListener, Runnable{
     JLabel valueLabel = new JLabel("Value:");
     JLabel searchConditionLabel = new JLabel("Search Condition:");
     
+    String[] fields2 = {"fName", "lName", "country", "state", "city", "condition"};
+    JComboBox<String> fieldsDropdown2 = new JComboBox<>(fields2);
+    
     JTextField valueField = new JTextField();
     String[] searchConditions = {"eq", "lt", "leq", "gt", "geq", "ne"};
     JComboBox<String> searchConditionDropdown = new JComboBox<>(searchConditions);
@@ -270,6 +273,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(vizButton);
 		frame.remove(lookupLabel);
 		frame.remove(fieldsDropdown);
+		frame.remove(fieldsDropdown2);
 		frame.remove(valueLabel);
 		frame.remove(valueField);
 		frame.remove(searchConditionLabel);
@@ -401,7 +405,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		
 		// Configure fields
 		lookupLabel.setBounds(5, 5, 100, 25);
-		fieldsDropdown.setBounds(90, 5, 100, 25);
+		fieldsDropdown2.setBounds(90, 5, 100, 25);
 		
 		valueLabel.setBounds(200, 5, 100, 25);
 		valueField.setBounds(240, 5, 80, 25);
@@ -436,7 +440,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.add(queryPageButton);
 		frame.add(vizButton);
 		frame.add(lookupLabel);
-		frame.add(fieldsDropdown);
+		frame.add(fieldsDropdown2);
 		frame.add(valueLabel);
 		frame.add(valueField);
 		frame.add(searchConditionLabel);
@@ -464,7 +468,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		frame.remove(queryPageButton);
 		frame.remove(vizButton);
 		frame.remove(lookupLabel);
-		frame.remove(fieldsDropdown);
+		frame.remove(fieldsDropdown2);
 		frame.remove(valueLabel);
 		frame.remove(valueField);
 		frame.remove(searchConditionLabel);
@@ -850,7 +854,7 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		// Execute read
 		if(e.getSource()==vizButton) {
 			
-			String field = fieldsDropdown.getSelectedItem().toString();
+			String field = fieldsDropdown2.getSelectedItem().toString();
 			String value = valueField.getText();
 			String searchCon = searchConditionDropdown.getSelectedItem().toString();
 			
