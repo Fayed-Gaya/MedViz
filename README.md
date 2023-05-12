@@ -151,7 +151,9 @@ MedViz uses Google's Firestore service. Google Firestore is a cloud-based NoSQL 
 ### Value Lookup Search
 - Field value look up
 - 7 different look up conditions supported
-- result visualization
+- Results are visualized in scrollable, easy to read table format
+
+  ![update](images/lookup.png)
 
 ### Patient Update
 - Patient record updating
