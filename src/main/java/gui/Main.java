@@ -29,6 +29,9 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		DataInputStream fromServer = null;
 		private Socket socket;
 		private boolean connectionStatus = false;
+	
+	// Admin Flag
+	private boolean adminFlag = false;
 		
 		
 	// GUI setup
@@ -311,10 +314,15 @@ public class Main extends JFrame implements ActionListener, Runnable{
 		logoutButton.addActionListener(this);
 		
 		// Add query page components
-		frame.add(createPatientPageButton);
+		
 		frame.add(vizualizerPageButton);
-		frame.add(updatePatientPageButton);
-		frame.add(deletePatientPageButton);
+		
+		if (adminFlag == true) {
+			frame.add(updatePatientPageButton);
+			frame.add(deletePatientPageButton);
+			frame.add(createPatientPageButton);
+		}
+
 		frame.add(logoutButton);
 		
 		// Repaint
@@ -686,6 +694,9 @@ public class Main extends JFrame implements ActionListener, Runnable{
 					JSONObject responseJSON = new JSONObject(inMessage);
 					
 					if (responseJSON.get("verified").toString().equals("true")) {
+						if (responseJSON.get("admin").toString().equals("true")) {
+							adminFlag = true;
+						}
 						System.out.println("Login Successful");
 						
 						messageLabel.setForeground(Color.green);
