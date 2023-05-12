@@ -66,7 +66,7 @@ public class Server extends JFrame implements Runnable{
 		menuBar.add(menu);
 		this.setJMenuBar(menuBar);
 		
-			// Create server log
+		// Create server log
 		serverLog = new JTextArea();
 		JScrollPane scrollPane = new JScrollPane(serverLog);
 		JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
@@ -303,6 +303,7 @@ public class Server extends JFrame implements Runnable{
 	}
 
 	public String read(String field, String val, String op) {
+		serverLog.append("\nAttempting Read...");
 		CollectionReference patients = db.collection("patients");
 		Query query = null;
 		ApiFuture<QuerySnapshot> querySnapshot = null;
@@ -310,31 +311,37 @@ public class Server extends JFrame implements Runnable{
 		//read op variable to decide how to handle query
 		switch(op) {
 		case "eq":
+			serverLog.append("\nEquals to search...");
 			query = patients.whereEqualTo(field, val);
 			querySnapshot = query.get();
 			break;
 		case "lt":
+			serverLog.append("\nLess than search...");
 			query = patients.whereLessThan(field, val);
 			querySnapshot = query.get();
 			break;
 		case "leq":
+			serverLog.append("\nLess than or equals to search...");
 			query = patients.whereLessThanOrEqualTo(field, val);
 			querySnapshot = query.get();
 			break;
 		case "gt":
+			serverLog.append("\nGreater than search...");
 			query = patients.whereGreaterThan(field, val);
 			querySnapshot = query.get();
 			break;
 		case "geq":
+			serverLog.append("\nGreater than or equal to search...");
 			query = patients.whereGreaterThanOrEqualTo(field, val);
 			querySnapshot = query.get();
 			break;
 		case "ne":
+			serverLog.append("\nNot equals to search...");
 			query = patients.whereNotEqualTo(field, val);
 			querySnapshot = query.get();
 			break;
 		default:
-			System.err.println("Invalid query operator");
+			System.out.println("Invalid query operator");
 			return null;
 		}
 		StringBuilder JSONArrayString = new StringBuilder("[");
@@ -359,7 +366,8 @@ public class Server extends JFrame implements Runnable{
 		}	
 		
 		JSONArrayString.append("]");
-
+		
+		serverLog.append("\nSearch succsesful. Returning results...");
 		return JSONArrayString.toString();
 	}
 	
@@ -433,6 +441,7 @@ public class Server extends JFrame implements Runnable{
 	}
 	
 	public String aggregate(Integer low, Integer high, String condition) {
+		serverLog.append("\nAttempting aggregate search...");
 		CollectionReference patients = db.collection("patients");
 		Query query = patients.whereGreaterThan("DOB", low.toString()).whereLessThan("DOB", high.toString());
 		ApiFuture<QuerySnapshot> querySnapshot = query.get();
@@ -471,6 +480,7 @@ public class Server extends JFrame implements Runnable{
 			response.append(", ");
 		}
 		response.append("}");
+		serverLog.append("\nAggregate search succsesful. Returning results...");
 		return response.toString();
 	}
 	
