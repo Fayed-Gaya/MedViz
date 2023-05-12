@@ -72,7 +72,7 @@ MedViz extends the foundational, three-tiered data system by re-implementing it 
 
 ### Data Sources
 Data is drawn from Synthea. A project released by best-in-class Not-for-profit MITRE containing synthetic patient and population health data from the state of Massachusetts. Data will be loaded into and queried from a GCP Firestore NOSQL database hosted on a Firebase instance.
-- Synthea (Create link here)
+- [Synthea](https://synthea.mitre.org/)
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
