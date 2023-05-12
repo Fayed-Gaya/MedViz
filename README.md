@@ -58,12 +58,6 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
 ### Project Proposal
 The Medical Visualizer, or MedViz for short, is a data visualization application focused on empowering users to derive meaningful insights from medical data including but not limited to patient records, and administrative payroll information.
 
@@ -179,6 +173,8 @@ MedViz uses Google's Firestore service. Google Firestore is a cloud-based NoSQL 
 ## Project Setup
 MedViz can be set up on your system by....
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
 <!-- MARKDOWN LINKS & IMAGES -->
 [product-screenshot]: images/loginTemp.png
 [login]: images/login.png
